@@ -6,12 +6,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
-@Table(name = "scheduleBatches")
+@Table(name = "schedulebatches")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -22,19 +23,35 @@ public class ScheduleBatchEntity {
     private Long id;
     private String courseName;
     private String courseType;
-    private Timestamp startDate;
-    private Timestamp endDate;
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
 
     //relation with course
     @OneToOne
     private CourseEntity course;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ScheduleBatchEntity that = (ScheduleBatchEntity) o;
+        return Objects.equals(id, that.id) &&
+                Objects.equals(courseName, that.courseName) &&
+                Objects.equals(courseType, that.courseType) &&
+                Objects.equals(startDate, that.startDate) &&
+                Objects.equals(endDate, that.endDate);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, courseName, courseType, startDate, endDate);
+    }
 
     //relation with batch
     @Builder.Default
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(
-            name = "scheduleBatches_program",
+            name = "schedulebatches_program",
             joinColumns = @JoinColumn(name = "programSchedule_id"),
             inverseJoinColumns = @JoinColumn(name = "batch_id")
     )
@@ -42,11 +59,8 @@ public class ScheduleBatchEntity {
 
     //relation with assignment
     @Builder.Default
-    @OneToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<AssignmentEntity> assignments = new HashSet<>();
 
-
-
-// Constructors, getters, and setters can be added here
-
+    // Constructors, getters, and setters can be added here
 }

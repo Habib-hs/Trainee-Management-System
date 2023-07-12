@@ -6,7 +6,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.*;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "batches")
@@ -23,18 +26,18 @@ public class BatchEntity {
     private Date endDate;
     private int numberOfTrainee;
 
-    //relation with classroom
-    @OneToOne (fetch = FetchType.EAGER,cascade = CascadeType.ALL)
+    // Relation with classroom
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private ClassroomEntity classroom;
 
-    //relation with trainee
+    // Relation with trainee
     @Builder.Default
-    @OneToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<TraineeEntity> trainees = new HashSet<>();
 
-    //relation with trainer
+    // Relation with trainer
     @Builder.Default
-    @ManyToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(
             name = "batch_trainer",
             joinColumns = @JoinColumn(name = "batch_id"),
@@ -42,9 +45,21 @@ public class BatchEntity {
     )
     private Set<TrainerEntity> trainers = new HashSet<>();
 
-    //relation with batchSchedule
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        BatchEntity that = (BatchEntity) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    // Relation with batchSchedule
     @Builder.Default
     @ManyToMany(mappedBy = "batches")
-    private Set<ScheduleBatchEntity> scheduleProgram = new HashSet<>();
-
+    private Set<ScheduleBatchEntity> schedulePrograms = new HashSet<>();
 }

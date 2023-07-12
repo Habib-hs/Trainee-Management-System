@@ -11,7 +11,7 @@ import java.sql.Timestamp;
 import java.util.Date;
 
 @Entity
-@Table(name = "submittedAssignment")
+@Table(name = "subassignment")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

@@ -4,8 +4,6 @@ package com.backend.tms.service.Impl;
 import com.backend.tms.entity.BatchEntity;
 import com.backend.tms.entity.CourseEntity;
 import com.backend.tms.entity.ScheduleBatchEntity;
-import com.backend.tms.exception.custom.BatchNotFoundException;
-import com.backend.tms.exception.custom.CourseNotFoundException;
 import com.backend.tms.model.ScheduleBatch.ScheduleBatchReqModel;
 import com.backend.tms.repository.BatchRepository;
 import com.backend.tms.repository.CourseRepository;
@@ -44,9 +42,8 @@ public class ScheduleBatchServiceImp implements ScheduleBatchService {
         ScheduleBatchEntity scheduleBatchEntity = new ScheduleBatchEntity();
         scheduleBatchEntity.setCourseName(scheduleBatchModel.getCourseName());
         scheduleBatchEntity.setCourseType(scheduleBatchModel.getCourseType());
-        scheduleBatchEntity.setStartDate(scheduleBatchModel.getStartDate());
-        scheduleBatchEntity.setEndDate(scheduleBatchModel.getEndDate());
-
+        scheduleBatchEntity.setStartDate(scheduleBatchModel.getStartDate().toLocalDateTime());
+        scheduleBatchEntity.setEndDate(scheduleBatchModel.getEndDate().toLocalDateTime());
         // Map CourseEntity
         String courseIdString = scheduleBatchModel.getCourseId();
         Long courseId = Long.parseLong(courseIdString);
@@ -57,6 +54,19 @@ public class ScheduleBatchServiceImp implements ScheduleBatchService {
             scheduleBatchEntity.setCourse(courseEntity);
         }
 
+        List<Long> batchIds = scheduleBatchModel.getBatchesIds();
+        Set<BatchEntity> batchEntities = new HashSet<>();
+
+        for (Long batchId : batchIds) {
+            var data = batchRepository.findById(batchId);
+            data.ifPresent(batchEntities::add);
+        }
+
+
+        scheduleBatchEntity.setBatches(batchEntities);
+
+
+        /*
         // Map BatchEntities
         List<Long> batchIds = scheduleBatchModel.getBatchesIds();
         Set <BatchEntity> batchEntities= new HashSet<>();
@@ -66,6 +76,7 @@ public class ScheduleBatchServiceImp implements ScheduleBatchService {
                 batchEntities.add(data.get());
             }
         }
+         */
         scheduleBatchEntity.setBatches(batchEntities);
         return scheduleBatchEntity;
     }
