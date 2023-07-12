@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -39,8 +40,24 @@ public class TrainerEntity {
     private Set<CourseEntity> courses = new HashSet<>();
 
     //relation with batch
+    @Builder.Default
     @ManyToMany(mappedBy = "trainers")
     private Set<BatchEntity> batches = new HashSet<>();
+
+    //hashcode comarison
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TrainerEntity that = (TrainerEntity) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
 
 
 }

@@ -31,8 +31,8 @@ public class BatchServiceImp implements BatchService {
 
 
         // Create a new BatchEntity
-        BatchEntity batchEntity = modelMapper.map(batchModel, BatchEntity.class);
-        batchRepository.save(batchEntity);
+        BatchEntity batchEntity = modelMapper.map(batchModel,BatchEntity.class);
+
 
         // Add classroom for the batch
         ClassroomEntity classroomEntity = ClassroomEntity.builder()
@@ -40,6 +40,7 @@ public class BatchServiceImp implements BatchService {
                 .className(batchEntity.getBatchName())
                 .build();
         classroomRepository.save(classroomEntity);
+        batchRepository.save(batchEntity);
 
         // If the save operation is successful, return a success message
         return new ResponseEntity<>("Batch added successfully", HttpStatus.CREATED);

@@ -7,5 +7,5 @@ import org.springframework.web.bind.annotation.RequestBody;
 import java.util.List;
 
 public interface AssignTraineeService {
-    ResponseEntity<Object> addTraineesToBatch(@PathVariable Long batchId, @RequestBody List<Long> traineeIds);
+    ResponseEntity<Object> addTraineesToBatch(Long batchId, List<Long> traineeIds);
 }

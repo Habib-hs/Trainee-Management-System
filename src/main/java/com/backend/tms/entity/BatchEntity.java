@@ -41,4 +41,10 @@ public class BatchEntity {
             inverseJoinColumns = @JoinColumn(name = "trainer_id")
     )
     private Set<TrainerEntity> trainers = new HashSet<>();
+
+    //relation with batchSchedule
+    @Builder.Default
+    @ManyToMany(mappedBy = "batches")
+    private Set<ScheduleBatchEntity> scheduleProgram = new HashSet<>();
+
 }

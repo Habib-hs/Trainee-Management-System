@@ -36,6 +36,20 @@ public class TraineeEntity {
     @OneToOne (cascade = CascadeType.ALL)
     private UserEntity user;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TraineeEntity that = (TraineeEntity) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+
 
     // Additional attributes and relationships can be added here
 
