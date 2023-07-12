@@ -29,6 +29,7 @@ public class BatchServiceImp implements BatchService {
            throw new BatchAlreadyExistsException("Batch Already exist with the same name!");
         }
 
+
         // Create a new BatchEntity
         BatchEntity batchEntity = modelMapper.map(batchModel, BatchEntity.class);
         batchRepository.save(batchEntity);
@@ -51,7 +52,7 @@ public class BatchServiceImp implements BatchService {
         // Delete the batch
         batchRepository.deleteById(batchId);
         // Delete the associated classroom
-        classroomRepository.deleteByClassroomId(batchId);
+        classroomRepository.deleteById(batchId);
         // Return a success message
         return new ResponseEntity<>("Batch deleted successfully", HttpStatus.OK);
     }

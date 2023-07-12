@@ -32,7 +32,13 @@ public class TrainerEntity {
     private String contactNumber;
     private String presentAddress;
 
-
+    //making relation with user
     @OneToOne(cascade = CascadeType.ALL)
     private UserEntity user;
+
+    //relation between trainer and course
+    @Builder.Default
+    @OneToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
+    private Set<CourseEntity> courses = new HashSet<>();
+
 }

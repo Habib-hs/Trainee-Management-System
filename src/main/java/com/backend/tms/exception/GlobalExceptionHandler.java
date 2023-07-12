@@ -1,9 +1,6 @@
 package com.backend.tms.exception;
 
-import com.backend.tms.exception.custom.BatchAlreadyExistsException;
-import com.backend.tms.exception.custom.BatchNotFoundException;
-import com.backend.tms.exception.custom.TraineeAlreadyExistsException;
-import com.backend.tms.exception.custom.TrainerAlreadyExistException;
+import com.backend.tms.exception.custom.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -15,7 +12,8 @@ public class GlobalExceptionHandler {
             TraineeAlreadyExistsException.class,
             TrainerAlreadyExistException.class,
             BatchNotFoundException.class,
-            BatchAlreadyExistsException.class
+            BatchAlreadyExistsException.class,
+            TrainerNotFoundException.class
     })
     public ResponseEntity<Object> handleCustomException(Exception ex) {
         if (ex instanceof TraineeAlreadyExistsException ) {
@@ -26,7 +24,10 @@ public class GlobalExceptionHandler {
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
         }else if (ex instanceof BatchAlreadyExistsException) {
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
-        }else {
+        }else if (ex instanceof TrainerNotFoundException){
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+        }else
+        {
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
