@@ -13,7 +13,7 @@ public class GlobalExceptionHandler {
             TrainerAlreadyExistException.class,
             BatchNotFoundException.class,
             BatchAlreadyExistsException.class,
-            TrainerNotFoundException.class
+            TraineeNotFoundException.class
     })
     public ResponseEntity<Object> handleCustomException(Exception ex) {
         if (ex instanceof TraineeAlreadyExistsException ) {
@@ -26,8 +26,9 @@ public class GlobalExceptionHandler {
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
         }else if (ex instanceof TrainerNotFoundException){
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
-        }else
-        {
+        }else if (ex instanceof TraineeNotFoundException){
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+        }else {
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

@@ -26,4 +26,19 @@ public class BatchEntity {
     //relation with classroom
     @OneToOne (fetch = FetchType.EAGER,cascade = CascadeType.ALL)
     private ClassroomEntity classroom;
+
+    //relation with trainee
+    @Builder.Default
+    @OneToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
+    private Set<TraineeEntity> trainees = new HashSet<>();
+
+    //relation with trainer
+    @Builder.Default
+    @ManyToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "batch_trainer",
+            joinColumns = @JoinColumn(name = "batch_id"),
+            inverseJoinColumns = @JoinColumn(name = "trainer_id")
+    )
+    private Set<TrainerEntity> trainers = new HashSet<>();
 }

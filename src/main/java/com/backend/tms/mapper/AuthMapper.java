@@ -26,7 +26,6 @@ public class AuthMapper {
                 .id(trainerReqModel.getId())
                 .fullName(trainerReqModel.getFullName())
                 .email(trainerReqModel.getEmail())
-                .password(trainerReqModel.getPassword())
                 .profilePicture(trainerReqModel.getProfilePicture())
                 .designation(trainerReqModel.getDesignation())
                 .joiningDate(trainerReqModel.getJoiningDate())

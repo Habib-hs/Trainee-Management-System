@@ -7,7 +7,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -17,14 +16,12 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 public class TrainerEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String fullName;
     private String profilePicture;
     private String email;
-    private String password;
     private String designation;
     private String joiningDate;
     private int yearsOfExperience;
@@ -36,9 +33,14 @@ public class TrainerEntity {
     @OneToOne(cascade = CascadeType.ALL)
     private UserEntity user;
 
-    //relation between trainer and course
+    //relation with course
     @Builder.Default
     @OneToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
     private Set<CourseEntity> courses = new HashSet<>();
+
+    //relation with batch
+    @ManyToMany(mappedBy = "trainers")
+    private Set<BatchEntity> batches = new HashSet<>();
+
 
 }
