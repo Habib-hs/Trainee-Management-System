@@ -6,6 +6,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 @Table(name = "classrooms")
 @Data
@@ -18,5 +21,10 @@ public class ClassroomEntity {
     private Long id;
     private String className;
     private String description;
+
+    //relation with post
+    @Builder.Default
+    @OneToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
+    private Set<PostEntity> posts = new HashSet<>();
 
 }

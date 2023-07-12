@@ -1,36 +1,32 @@
 package com.backend.tms.entity;
 
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.sql.Timestamp;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+
 @Entity
-@Table(name = "assignments")
+@Table(name = "posts")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AssignmentEntity {
+public class PostEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long scheduleId;
-    private String name;
-    private String type;
-    private String file;
-    private Timestamp deadline;
+    private Long trainerId;
+    private Long batchId;
+    private String postTitle;
+    private String postBody;
+    private String attachment;
 
-
-
-    //relation with submittedAssignment
+    //for the comment relationship
     @Builder.Default
     @OneToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
-    private Set<SubmitAssignmentEntity> subAssignments = new HashSet<>();
+    private Set<CommentEntity> comments = new HashSet<>();
 }
