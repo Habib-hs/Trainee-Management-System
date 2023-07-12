@@ -36,7 +36,7 @@ public class ScheduleBatchServiceImp implements ScheduleBatchService {
         if (savedScheduleBatch != null) {
             return new ResponseEntity<>("A program scheduled successfully", HttpStatus.CREATED);
         } else {
-            return null;
+            return new ResponseEntity<>("Failed to schedule the program", HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
     }
