@@ -28,7 +28,6 @@ public class AssignmentEntity {
     private Timestamp deadline;
 
 
-
     //relation with submittedAssignment
     @Builder.Default
     @OneToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)

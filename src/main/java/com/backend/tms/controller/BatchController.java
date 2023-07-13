@@ -21,6 +21,22 @@ public class BatchController {
 
     }
 
+    @GetMapping("/get/all")
+    public ResponseEntity<Object> getAllBatches() {
+        return batchService.getAllBatches();
+    }
+
+    @GetMapping("/get/{id}")
+    public ResponseEntity<Object> getBatch(@PathVariable("id") Long batchId) {
+        return batchService.getBatch(batchId);
+    }
+
+    @PutMapping("/update/{id}")
+    public ResponseEntity<Object> updateBatch(@PathVariable("id") Long batchId, @RequestBody BatchReqModel batchModel) {
+        return batchService.updateBatch(batchId, batchModel);
+    }
+
+
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Object>deleteBatch(@PathVariable("id") Long batchId) {
         return batchService.deleteBatch(batchId);
