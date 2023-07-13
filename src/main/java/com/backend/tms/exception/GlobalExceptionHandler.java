@@ -1,6 +1,7 @@
 package com.backend.tms.exception;
 
 import com.backend.tms.exception.custom.*;
+import com.backend.tms.exception.custom.IllegalArgumentException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -14,11 +15,14 @@ public class GlobalExceptionHandler {
             BatchNotFoundException.class,
             BatchAlreadyExistsException.class,
             TraineeNotFoundException.class,
+            TrainerNotFoundException.class,
             CourseNotFoundException.class,
             CourseAlreadyExistsException.class,
             ScheduleNotFoundException.class,
             InternalServerErrorException.class,
-            AssignmentNotFoundException.class
+            AssignmentNotFoundException.class,
+            PostNotFoundException.class,
+            IllegalArgumentException.class
 
     })
     public ResponseEntity<Object> handleCustomException(Exception ex) {
@@ -38,12 +42,17 @@ public class GlobalExceptionHandler {
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
         }else if (ex instanceof CourseAlreadyExistsException){
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
-        }
-        else if (ex instanceof ScheduleNotFoundException){
+        } else if (ex instanceof TrainerNotFoundException){
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+        } else if (ex instanceof ScheduleNotFoundException){
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
         }else if (ex instanceof  AssignmentNotFoundException){
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
-        }else{
+        }else if (ex instanceof  PostNotFoundException){
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+        }else if (ex instanceof  IllegalArgumentException){
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        } else{
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

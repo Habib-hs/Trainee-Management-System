@@ -81,7 +81,6 @@ public class BatchServiceImp implements BatchService {
         return new ResponseEntity<>(batchModels, HttpStatus.OK);
     }
 
-
     @Override
     public ResponseEntity<Object> updateBatch(Long batchId, BatchReqModel batchModel) {
         // Check if the batch exists
