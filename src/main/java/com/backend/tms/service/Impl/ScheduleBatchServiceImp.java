@@ -32,6 +32,13 @@ public class ScheduleBatchServiceImp implements ScheduleBatchService {
     @Override
     public ResponseEntity<Object> createScheduleBatch(ScheduleBatchReqModel scheduleBatchModel) {
 
+
+        String courseType = scheduleBatchModel.getCourseType();
+        if (courseType.equals("common")) {
+            // Handle scheduling for common type course
+            return handleCommonCourseScheduling(scheduleBatchModel);
+        }
+
         //time validation
         LocalDateTime startDate = scheduleBatchModel.getStartDate().toLocalDateTime();
         LocalDateTime endDate = scheduleBatchModel.getEndDate().toLocalDateTime();
@@ -103,6 +110,64 @@ public class ScheduleBatchServiceImp implements ScheduleBatchService {
             }
         }
         return new ResponseEntity<>("Failed to schedule the program", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+
+
+    private ResponseEntity<Object> handleCommonCourseScheduling(ScheduleBatchReqModel scheduleBatchModel) {
+        LocalDateTime startDate = scheduleBatchModel.getStartDate().toLocalDateTime();
+        LocalDateTime endDate = scheduleBatchModel.getEndDate().toLocalDateTime();
+
+        // Check that the starting date is not greater than the ending date
+        if (startDate.isAfter(endDate)) {
+            return new ResponseEntity<>("Starting date cannot be later than the ending date", HttpStatus.BAD_REQUEST);
+        }
+
+        // Check that the time schedule length does not exceed four months
+        if (startDate.plusMonths(4).isBefore(endDate)) {
+            return new ResponseEntity<>("Time schedule length should not exceed four months", HttpStatus.BAD_REQUEST);
+        }
+
+        // Check for conflicts with existing common courses
+        Set<ScheduleBatchEntity> existingSchedules = new HashSet<>();
+        existingSchedules.addAll(scheduleRepository.findByCourseType("common"));
+
+        for (ScheduleBatchEntity existingSchedule : existingSchedules) {
+            LocalDateTime existingStartDate = existingSchedule.getStartDate();
+            LocalDateTime existingEndDate = existingSchedule.getEndDate();
+
+            // Check if the requested course's start date falls within an existing schedule
+            if (startDate.isAfter(existingStartDate) && startDate.isBefore(existingEndDate)) {
+                return new ResponseEntity<>("The course overlaps with an existing common course", HttpStatus.BAD_REQUEST);
+            }
+
+            // Check if the requested course's end date falls within an existing schedule
+            if (endDate.isAfter(existingStartDate) && endDate.isBefore(existingEndDate)) {
+                return new ResponseEntity<>("The course overlaps with an existing common course", HttpStatus.BAD_REQUEST);
+            }
+
+            // Check if the requested course's start date and end date enclose an existing schedule
+            if (startDate.isBefore(existingStartDate) && endDate.isAfter(existingEndDate)) {
+                return new ResponseEntity<>("The course overlaps with an existing common course", HttpStatus.BAD_REQUEST);
+            }
+        }
+
+        // Schedule the common course across all batches
+        List<Long> batchIds = scheduleBatchModel.getBatchesIds();
+        Set<BatchEntity> batches = new HashSet<>();
+
+        for (Long batchId : batchIds) {
+            BatchEntity batch = batchRepository.findById(batchId)
+                    .orElseThrow(() -> new BatchNotFoundException("Batch not found with ID: " + batchId));
+
+            batches.add(batch);
+        }
+        // Create a new schedule for the common course with all batches
+        ScheduleBatchEntity scheduleBatchEntity = mapToScheduleBatchEntity(scheduleBatchModel);
+        scheduleBatchEntity.setBatches(batches);
+        scheduleRepository.save(scheduleBatchEntity);
+
+        return new ResponseEntity<>("A common course scheduled successfully", HttpStatus.CREATED);
     }
 
     private ScheduleBatchEntity mapToScheduleBatchEntity(ScheduleBatchReqModel scheduleBatchModel) {
