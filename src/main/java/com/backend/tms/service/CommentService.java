@@ -5,4 +5,5 @@ import org.springframework.http.ResponseEntity;
 
 public interface CommentService {
     ResponseEntity<Object> createComment(Long postId, CommentReqModel commentModel);
+    ResponseEntity<Object> updateComment(Long commentId, CommentReqModel commentModel);
 }

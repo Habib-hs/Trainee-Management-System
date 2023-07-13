@@ -18,4 +18,9 @@ public class CommentController {
         return commentService.createComment(postId, commentModel);
     }
 
+    @PutMapping("/{postId}")
+    public ResponseEntity<Object> updateComment(@PathVariable("postId") Long postId, @RequestBody CommentReqModel commentModel) {
+        return commentService.updateComment(postId, commentModel);
+    }
+
 }
