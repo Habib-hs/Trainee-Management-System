@@ -17,4 +17,6 @@ public class PostController {
     public ResponseEntity<Object> createPost(@RequestBody PostReqModel postModel) {
         return postService.createPost(postModel);
     }
+
+
 }

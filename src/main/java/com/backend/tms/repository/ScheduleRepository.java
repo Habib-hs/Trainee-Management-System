@@ -1,5 +1,7 @@
 package com.backend.tms.repository;
 
+import com.backend.tms.entity.AssignmentEntity;
+import com.backend.tms.entity.ClassroomEntity;
 import com.backend.tms.entity.ScheduleBatchEntity;
 import com.backend.tms.entity.TraineeEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,4 +15,5 @@ public interface ScheduleRepository extends JpaRepository<ScheduleBatchEntity, L
     // Add any additional methods specific to the TraineeEntity if needed
     Optional<ScheduleBatchEntity> findById(Long scheduleId);
     List<ScheduleBatchEntity> findByCourseType(String courseType);
+    ScheduleBatchEntity findByAssignmentsContaining(AssignmentEntity assignmentEntity);
 }

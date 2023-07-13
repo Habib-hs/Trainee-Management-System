@@ -18,4 +18,19 @@ public class AssignmentController {
         return assignmentService.createAssignment(assignmentModel);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<Object> getAssignment(@PathVariable("id") Long assignmentId) {
+        return assignmentService.getAssignment(assignmentId);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Object> updateAssignment(@PathVariable("id") Long assignmentId, @RequestBody AssignmentReqModel assignmentModel) {
+        return assignmentService.updateAssignment(assignmentId, assignmentModel);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Object> deleteAssignment(@PathVariable("id") Long assignmentId) {
+        return assignmentService.deleteAssignment(assignmentId);
+    }
+
 }
