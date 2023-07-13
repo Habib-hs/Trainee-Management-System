@@ -29,10 +29,8 @@ public class BatchServiceImp implements BatchService {
            throw new BatchAlreadyExistsException("Batch Already exist with the same name!");
         }
 
-
         // Create a new BatchEntity
         BatchEntity batchEntity = modelMapper.map(batchModel,BatchEntity.class);
-
 
         // Add classroom for the batch
         ClassroomEntity classroomEntity = ClassroomEntity.builder()
@@ -40,6 +38,7 @@ public class BatchServiceImp implements BatchService {
                 .className(batchEntity.getBatchName())
                 .build();
         classroomRepository.save(classroomEntity);
+        batchEntity.setClassroom(classroomEntity);;
         batchRepository.save(batchEntity);
 
         // If the save operation is successful, return a success message
