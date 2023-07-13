@@ -3,6 +3,7 @@ package com.backend.tms.service.Impl;
 import com.backend.tms.entity.BatchEntity;
 import com.backend.tms.entity.CourseEntity;
 import com.backend.tms.entity.TrainerEntity;
+import com.backend.tms.exception.custom.CourseAlreadyExistsException;
 import com.backend.tms.exception.custom.TrainerNotFoundException;
 import com.backend.tms.model.Course.CourseReqModel;
 import com.backend.tms.repository.CourseRepository;
@@ -29,10 +30,10 @@ public class CourseServiceImp implements CourseService {
         TrainerEntity assignedTrainer = trainerRepository.findById(courseModel.getAssignedTrainerId())
                 .orElseThrow(() -> new TrainerNotFoundException("Trainer not found with ID: " + courseModel.getAssignedTrainerId()));
 
-        //// Check if the course with the given name already exists
-        //    if (courseRepository.findByCourseName(courseModel.getCourseName()) != null) {
-        //        throw new CourseAlreadyExistsException("Course already exists with the given name");
-        //    }
+        // Check if the course with the given name already exists
+          if (courseRepository.findByName(courseModel.getName()) !=  null) {
+             throw new CourseAlreadyExistsException("Course already exists with the given name");
+            }
 
         // Create CourseEntity
         CourseEntity courseEntity =  modelMapper.map(courseModel, CourseEntity.class);
