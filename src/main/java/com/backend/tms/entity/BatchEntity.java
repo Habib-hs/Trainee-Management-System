@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Objects;
@@ -22,8 +23,8 @@ public class BatchEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String batchName;
-    private Date startDate;
-    private Date endDate;
+    private Timestamp startDate;
+    private Timestamp endDate;
     private int numberOfTrainee;
 
     // Relation with classroom
