@@ -4,9 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.sql.Date;
 import java.sql.Timestamp;
-import java.util.Date;
 
 @Data
 @NoArgsConstructor
@@ -17,8 +18,8 @@ public class AssignmentReqModel {
     private Long scheduleId;
     private String name;
     private String type;
-    private String File;
-    private Timestamp deadline;
+    private Date deadline;
+    private MultipartFile file;
 
     // Constructors, getters, and setters can be added here
 }

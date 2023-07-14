@@ -1,21 +1,27 @@
 package com.backend.tms.service.Impl;
+import java.io.File;
+import java.nio.charset.StandardCharsets;
+
+
 import com.backend.tms.entity.AssignmentEntity;
-import com.backend.tms.entity.ClassroomEntity;
 import com.backend.tms.entity.ScheduleBatchEntity;
 import com.backend.tms.exception.custom.AssignmentNotFoundException;
 import com.backend.tms.exception.custom.ScheduleNotFoundException;
 import com.backend.tms.model.Classroom.AssignmentReqModel;
 import com.backend.tms.model.Classroom.AssignmentResModel;
 import com.backend.tms.repository.AssignmentRepository;
-import com.backend.tms.repository.ClassroomRepository;
 import com.backend.tms.repository.ScheduleRepository;
 import com.backend.tms.service.AssignmentService;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.FileUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 
 
 @Service
@@ -25,14 +31,24 @@ public class AssignmentServiceImp implements AssignmentService {
     private final AssignmentRepository assignmentRepository;
     private final ScheduleRepository scheduleRepository;
     private final ModelMapper modelMapper;
+    private static final String UPLOAD_DIR = "D:\\TMS FILE";
+    private static final String DOWNLOAD_DIR = "D:\\TMS FILE DOWNLOAD";
 
-    @Override
     public ResponseEntity<Object> createAssignment(AssignmentReqModel assignmentModel) {
         try {
-            // Map AssignmentReqModel to AssignmentEntity
-            AssignmentEntity assignmentEntity = modelMapper.map(assignmentModel, AssignmentEntity.class);
+            MultipartFile file = assignmentModel.getFile();
+            if (file.isEmpty()) {
+                return ResponseEntity.badRequest().body("No file selected.");
+            }
 
-            // Add assignment to the corresponding ScheduleBatchEntity
+            String fileUrl = uploadFile(file);
+            if (fileUrl == null) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload the file");
+            }
+
+            AssignmentEntity assignmentEntity = modelMapper.map(assignmentModel, AssignmentEntity.class);
+            assignmentEntity.setFileUrl(fileUrl);
+
             ScheduleBatchEntity scheduleBatchEntity = scheduleRepository
                     .findById(assignmentModel.getScheduleId())
                     .orElseThrow(() -> new ScheduleNotFoundException("Schedule not found"));
@@ -45,6 +61,32 @@ public class AssignmentServiceImp implements AssignmentService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to create assignment");
+        }
+    }
+
+    public ResponseEntity<Object> updateAssignment(Long assignmentId, AssignmentReqModel assignmentModel) {
+        try {
+            AssignmentEntity assignmentEntity = assignmentRepository.findById(assignmentId)
+                    .orElseThrow(() -> new AssignmentNotFoundException("Assignment not found"));
+
+            updateAssignmentAttributes(assignmentEntity, assignmentModel);
+
+            MultipartFile file = assignmentModel.getFile();
+            if (file != null && !file.isEmpty()) {
+                String fileUrl = uploadFile(file);
+                if (fileUrl == null) {
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload the file");
+                }
+                assignmentEntity.setFileUrl(fileUrl);
+            }
+
+            assignmentRepository.save(assignmentEntity);
+
+            return ResponseEntity.status(HttpStatus.OK).body("Assignment updated successfully");
+        } catch (AssignmentNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update assignment");
         }
     }
 
@@ -65,48 +107,56 @@ public class AssignmentServiceImp implements AssignmentService {
     }
 
     @Override
-    public ResponseEntity<Object> updateAssignment(Long assignmentId, AssignmentReqModel assignmentModel) {
-        try {
-            AssignmentEntity assignmentEntity = assignmentRepository.findById(assignmentId)
-                    .orElseThrow(() -> new AssignmentNotFoundException("Assignment not found"));
-
-            assignmentEntity.setName(assignmentModel.getName());
-            assignmentEntity.setType(assignmentModel.getType());
-            assignmentEntity.setFile(assignmentModel.getFile());
-            assignmentEntity.setDeadline(assignmentModel.getDeadline());
-
-            assignmentRepository.save(assignmentEntity);
-
-            return ResponseEntity.status(HttpStatus.OK).body("Assignment updated successfully");
-        } catch (AssignmentNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update assignment");
+    public ResponseEntity<Object> downloadAssignmentFile(Long assignmentId) {
+        AssignmentEntity assignmentEntity = assignmentRepository.getById(assignmentId);
+        if (assignmentEntity == null || assignmentEntity.getFileUrl() == null) {
+            return ResponseEntity.notFound().build();
         }
-    }
-
-    @Override
-    public ResponseEntity<Object> deleteAssignment(Long assignmentId) {
+        // Perform any necessary operations with the assignment file
         try {
-            AssignmentEntity assignmentEntity = assignmentRepository.findById(assignmentId)
-                    .orElseThrow(() -> new AssignmentNotFoundException("Assignment not found"));
+            File file = new File(assignmentEntity.getFileUrl());
+            String fileContents = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
 
-            // Remove the assignment from the associated ClassroomEntity
-            ScheduleBatchEntity scheduleEntity = scheduleRepository.findByAssignmentsContaining(assignmentEntity);
-            if (scheduleEntity != null) {
-                scheduleEntity.getAssignments().remove(assignmentEntity);
-                scheduleRepository.save(scheduleEntity);
+            // Create a new file in the specified directory
+            String fileName = StringUtils.cleanPath(file.getName());
+            File destinationDir = new File(DOWNLOAD_DIR);
+            if (!destinationDir.exists()) {
+                destinationDir.mkdirs(); // Create the directory if it doesn't exist
             }
-
-            // Delete the assignment
-            assignmentRepository.delete(assignmentEntity);
-
-            return ResponseEntity.status(HttpStatus.OK).body("Assignment deleted successfully");
-        } catch (AssignmentNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to delete assignment");
+            File destinationFile = new File(destinationDir, fileName);
+            FileUtils.writeStringToFile(destinationFile, fileContents, StandardCharsets.UTF_8);
+            String message = "Download successful. File saved to: " + destinationFile.getAbsolutePath();
+            return ResponseEntity.ok(message);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to read or save the file");
         }
     }
+
+    private void updateAssignmentAttributes(AssignmentEntity assignmentEntity, AssignmentReqModel assignmentModel) {
+        assignmentEntity.setName(assignmentModel.getName());
+        assignmentEntity.setType(assignmentModel.getType());
+        assignmentEntity.setDeadline(assignmentModel.getDeadline());
+        // Update other assignment attributes as needed
+    }
+
+    private String uploadFile(MultipartFile file) {
+        if (file != null && !file.isEmpty()) {
+            try {
+                String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+                File destinationDir = new File(UPLOAD_DIR);
+                if (!destinationDir.exists()) {
+                    destinationDir.mkdirs(); // Create the directory if it doesn't exist
+                }
+                File destinationFile = new File(destinationDir, fileName);
+                file.transferTo(destinationFile);
+                return destinationFile.getAbsolutePath();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
 
 }
