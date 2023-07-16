@@ -11,7 +11,7 @@ import java.sql.Timestamp;
 import java.util.Date;
 
 @Entity
-@Table(name = "subassignment")
+@Table(name = "submission")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -22,6 +22,6 @@ public class SubmitAssignmentEntity {
     private Long id;
     private Long assignmentId;
     private Long traineeId;
-    private String assignmentFile;
-    private Timestamp time;
+    private String submitFileUrl;
+    private Date time;
 }

@@ -4,9 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.sql.Date;
 import java.sql.Timestamp;
-import java.util.Date;
 
 @Data
 @NoArgsConstructor
@@ -16,6 +17,6 @@ public class SubmitAssignmentReqModel {
     private Long id;
     private Long assignmentId;
     private Long traineeId;
-    private String assignmentFile;
-    private Timestamp time;
+    private Date time;
+    private MultipartFile file;
 }

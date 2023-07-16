@@ -2,7 +2,6 @@ package com.backend.tms.service.Impl;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 
-
 import com.backend.tms.entity.AssignmentEntity;
 import com.backend.tms.entity.ScheduleBatchEntity;
 import com.backend.tms.exception.custom.AssignmentNotFoundException;
@@ -95,9 +94,7 @@ public class AssignmentServiceImp implements AssignmentService {
         try {
             AssignmentEntity assignmentEntity = assignmentRepository.findById(assignmentId)
                     .orElseThrow(() -> new AssignmentNotFoundException("Assignment not found"));
-
             AssignmentResModel assignmentModel = modelMapper.map(assignmentEntity, AssignmentResModel.class);
-
             return ResponseEntity.status(HttpStatus.OK).body(assignmentModel);
         } catch (AssignmentNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
