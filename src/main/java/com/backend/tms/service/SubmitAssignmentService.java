@@ -5,4 +5,6 @@ import org.springframework.http.ResponseEntity;
 
 public interface SubmitAssignmentService {
     ResponseEntity<Object> submitAssignment(Long assignmentId, SubmitAssignmentReqModel submitAssignmentModel);
+    ResponseEntity<Object> updateAssignment(Long subAssignmentId, SubmitAssignmentReqModel submitAssignmentModel);
+    ResponseEntity<Object> downloadAssignment(Long assignmentId);
 }

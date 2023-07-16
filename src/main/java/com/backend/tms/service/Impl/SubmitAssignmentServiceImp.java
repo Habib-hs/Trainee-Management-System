@@ -66,6 +66,41 @@ public class SubmitAssignmentServiceImp implements SubmitAssignmentService {
         }
     }
 
+    @Override
+    public ResponseEntity<Object> updateAssignment(Long subAssignmentId, SubmitAssignmentReqModel submitAssignmentModel) {
+        try {
+            MultipartFile file = submitAssignmentModel.getFile();
+            if (file.isEmpty()) {
+                return ResponseEntity.badRequest().body("No file selected.");
+            }
+            String fileUrl = uploadFile(file);
+            if (fileUrl == null) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload the file");
+            }
+
+            // Retrieve the existing submitted assignment
+            Optional<SubmitAssignmentEntity> submittedAssignment = submitAssignmentRepository.findById(subAssignmentId);
+            if (submittedAssignment.isPresent()) {
+                SubmitAssignmentEntity subAssignmentEntity = submittedAssignment.get();
+                subAssignmentEntity.setAssignmentId(subAssignmentEntity.getAssignmentId());
+                subAssignmentEntity.setTraineeId(subAssignmentEntity.getTraineeId());
+                subAssignmentEntity.setSubmitFileUrl(fileUrl);
+                subAssignmentEntity.setTime(submitAssignmentModel.getTime());
+                submitAssignmentRepository.save(subAssignmentEntity);
+                // Return a success response
+                return ResponseEntity.ok("Assignment updated successfully");
+            }else {
+                throw new AssignmentNotFoundException("Assignment not found with ID: " + subAssignmentId);
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update the assignment");
+        }
+    }
+
+    @Override
+    public ResponseEntity<Object> downloadAssignment(Long assignmentId) {
+        return null;
+    }
 
     private String uploadFile(MultipartFile file) {
         if (file != null && !file.isEmpty()) {

@@ -19,4 +19,15 @@ public class SubmitAssignmentController {
                                                    @ModelAttribute SubmitAssignmentReqModel submitAssignmentModel) {
         return submitAssignmentService.submitAssignment(assignmentId, submitAssignmentModel);
     }
+
+    @PutMapping("/{subAssignmentId}")
+    public ResponseEntity<Object> updateAssignment(@PathVariable("subAssignmentId") Long subAssignmentId,
+                                                   @ModelAttribute SubmitAssignmentReqModel submitAssignmentModel) {
+        return submitAssignmentService.updateAssignment(subAssignmentId, submitAssignmentModel);
+    }
+
+    @GetMapping("/{assignmentId}/download")
+    public ResponseEntity<Object> downloadAssignment(@PathVariable("assignmentId") Long assignmentId) {
+        return submitAssignmentService.downloadAssignment(assignmentId);
+    }
 }
