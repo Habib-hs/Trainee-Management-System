@@ -15,5 +15,6 @@ public interface ScheduleRepository extends JpaRepository<ScheduleBatchEntity, L
     // Add any additional methods specific to the TraineeEntity if needed
     Optional<ScheduleBatchEntity> findById(Long scheduleId);
     List<ScheduleBatchEntity> findByCourseType(String courseType);
+    ScheduleBatchEntity findByCourseName (String CourseName);
     ScheduleBatchEntity findByAssignmentsContaining(AssignmentEntity assignmentEntity);
 }
