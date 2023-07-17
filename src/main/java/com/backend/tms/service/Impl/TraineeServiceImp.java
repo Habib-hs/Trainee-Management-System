@@ -8,6 +8,7 @@ import com.backend.tms.exception.custom.TraineeNotFoundException;
 import com.backend.tms.model.Course.CourseResModel;
 import com.backend.tms.model.Trainee.TraineeReqModel;
 import com.backend.tms.model.Trainee.TraineeResModel;
+import com.backend.tms.model.Trainee.TraineeUpdateReqModel;
 import com.backend.tms.repository.TraineeRepository;
 import com.backend.tms.service.TraineeService;
 import lombok.RequiredArgsConstructor;
@@ -50,7 +51,7 @@ public class TraineeServiceImp implements TraineeService {
     }
 
     @Override
-    public ResponseEntity<Object> updateTrainee(Long traineeId, TraineeReqModel traineeModel) {
+    public ResponseEntity<Object> updateTrainee(Long traineeId, TraineeUpdateReqModel traineeModel) {
         // Check if the trainee exists
         TraineeEntity traineeEntity = traineeRepository.findById(traineeId)
                 .orElseThrow(() -> new TraineeNotFoundException("Trainee not found with ID: " + traineeId));
@@ -60,7 +61,6 @@ public class TraineeServiceImp implements TraineeService {
                 traineeEntity.setProfilePicture(traineeModel.getProfilePicture());
                 traineeEntity.setGender(traineeModel.getGender());
                 traineeEntity.setDateOfBirth(traineeModel.getDateOfBirth());
-                traineeEntity.setDomain(traineeModel.getDomain());
                 traineeEntity.setContactNumber(traineeModel.getContactNumber());
                 traineeEntity.setDegreeName(traineeModel.getDegreeName());
                 traineeEntity.setEducationalInstitute(traineeModel.getEducationalInstitute());

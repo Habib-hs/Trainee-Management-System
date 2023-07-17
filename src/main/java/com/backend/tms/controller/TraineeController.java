@@ -1,6 +1,6 @@
 package com.backend.tms.controller;
 
-import com.backend.tms.model.Trainee.TraineeReqModel;
+import com.backend.tms.model.Trainee.TraineeUpdateReqModel;
 import com.backend.tms.service.TraineeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +27,7 @@ public class TraineeController {
     @PutMapping("/update/{id}")
     public ResponseEntity<Object> updateTrainee(
             @PathVariable("id") Long traineeId,
-            @RequestBody TraineeReqModel traineeModel
+            @RequestBody TraineeUpdateReqModel traineeModel
     ) {
         return traineeService.updateTrainee(traineeId, traineeModel);
     }
