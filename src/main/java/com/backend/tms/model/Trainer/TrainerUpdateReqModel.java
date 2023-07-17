@@ -9,11 +9,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class TrainerReqModel {
-    private Long id;
+public class TrainerUpdateReqModel {
     private String fullName;
-    private String email;
-    private String password;
     private String profilePicture;
     private String designation;
     private String joiningDate;
@@ -21,5 +18,4 @@ public class TrainerReqModel {
     private String expertises;
     private String contactNumber;
     private String presentAddress;
-
 }
