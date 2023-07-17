@@ -1,6 +1,6 @@
 package com.backend.tms.service.Impl;
 
-import com.backend.tms.entity.ClassroomEntity;
+import com.backend.tms.entity.BatchEntity;
 import com.backend.tms.entity.PostEntity;
 import com.backend.tms.entity.TrainerEntity;
 import com.backend.tms.exception.custom.BatchNotFoundException;
@@ -8,7 +8,7 @@ import com.backend.tms.exception.custom.PostNotFoundException;
 import com.backend.tms.exception.custom.TrainerNotFoundException;
 import com.backend.tms.model.Classroom.PostReqModel;
 import com.backend.tms.model.Classroom.PostResModel;
-import com.backend.tms.repository.ClassroomRepository;
+import com.backend.tms.repository.BatchRepository;
 import com.backend.tms.repository.PostRepository;
 import com.backend.tms.repository.TrainerRepository;
 import com.backend.tms.service.PostService;
@@ -22,14 +22,14 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class PostServiceImp implements PostService {
     private final PostRepository postRepository;
-    private final ClassroomRepository classroomRepository;
+    private final BatchRepository batchRepository;
     private final TrainerRepository trainerRepository;
     private final ModelMapper modelMapper;
 
     @Override
     public ResponseEntity<Object> createPost(PostReqModel postModel) {
         // Validate if the associated batch exists
-        ClassroomEntity classroom = classroomRepository.findById(postModel.getBatchId())
+        BatchEntity batch = batchRepository.findById(postModel.getBatchId())
                 .orElseThrow(() -> new BatchNotFoundException("Batch not found"));
 
         // Validate if the associated trainer exists
@@ -43,8 +43,8 @@ public class PostServiceImp implements PostService {
         PostEntity createdPost = postRepository.save(postEntity);
 
         // Add the created post to the classroom
-        classroom.getPosts().add(createdPost);
-        classroomRepository.save(classroom);
+        trainer.getPosts().add(createdPost);
+        trainerRepository.save(trainer);
 
         return ResponseEntity.status(HttpStatus.CREATED).body("Post created successfully");
     }

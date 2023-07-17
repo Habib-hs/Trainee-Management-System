@@ -27,10 +27,6 @@ public class BatchEntity {
     private Timestamp endDate;
     private int numberOfTrainee;
 
-    // Relation with classroom
-    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private ClassroomEntity classroom;
-
     // Relation with trainee
     @Builder.Default
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)

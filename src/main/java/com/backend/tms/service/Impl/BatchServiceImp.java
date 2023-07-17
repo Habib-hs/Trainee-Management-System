@@ -1,13 +1,11 @@
 package com.backend.tms.service.Impl;
 
 import com.backend.tms.entity.BatchEntity;
-import com.backend.tms.entity.ClassroomEntity;
 import com.backend.tms.exception.custom.BatchAlreadyExistsException;
 import com.backend.tms.exception.custom.BatchNotFoundException;
 import com.backend.tms.model.Batch.BatchReqModel;
 import com.backend.tms.model.Batch.BatchResModel;
 import com.backend.tms.repository.BatchRepository;
-import com.backend.tms.repository.ClassroomRepository;
 import com.backend.tms.service.BatchService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -17,13 +15,12 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor
 public class BatchServiceImp implements BatchService {
     private final BatchRepository batchRepository;
-    private final ClassroomRepository classroomRepository;
     private final ModelMapper modelMapper;
     @Override
     public ResponseEntity<Object> createBatch(BatchReqModel batchModel) {
@@ -36,14 +33,6 @@ public class BatchServiceImp implements BatchService {
 
         // Create a new BatchEntity
         BatchEntity batchEntity = modelMapper.map(batchModel,BatchEntity.class);
-
-        // Add classroom for the batch
-        ClassroomEntity classroomEntity = ClassroomEntity.builder()
-                .id(batchEntity.getId())
-                .className(batchEntity.getBatchName())
-                .build();
-        classroomRepository.save(classroomEntity);
-        batchEntity.setClassroom(classroomEntity);;
         batchRepository.save(batchEntity);
 
         // If the save operation is successful, return a success message
@@ -106,8 +95,6 @@ public class BatchServiceImp implements BatchService {
         batchRepository.findById(batchId).orElseThrow(()->new BatchNotFoundException("Batch not found"));
         // Delete the batch
         batchRepository.deleteById(batchId);
-        // Delete the associated classroom
-        classroomRepository.deleteById(batchId);
         // Return a success message
         return new ResponseEntity<>("Batch deleted successfully", HttpStatus.OK);
     }

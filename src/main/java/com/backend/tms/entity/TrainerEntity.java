@@ -44,7 +44,12 @@ public class TrainerEntity {
     @ManyToMany(mappedBy = "trainers")
     private Set<BatchEntity> batches = new HashSet<>();
 
-    //hashcode comarison
+    //relation with post
+    @Builder.Default
+    @OneToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
+    private Set<PostEntity> posts = new HashSet<>();
+
+    //hashcode compare
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

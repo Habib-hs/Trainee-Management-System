@@ -29,4 +29,6 @@ public class PostEntity {
     @Builder.Default
     @OneToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
     private Set<CommentEntity> comments = new HashSet<>();
+
+
 }
