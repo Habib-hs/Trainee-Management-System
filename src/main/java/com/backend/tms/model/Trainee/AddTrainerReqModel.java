@@ -11,8 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AddTraineeReqModel {
-        private Long batchId;
-        private List<Long> traineeIds;
-
+public class AddTrainerReqModel {
+    private Long batchId;
+    private List<Long> trainerIds;
 }

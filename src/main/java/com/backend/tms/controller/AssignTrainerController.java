@@ -1,5 +1,6 @@
 package com.backend.tms.controller;
 
+import com.backend.tms.model.Trainee.AddTrainerReqModel;
 import com.backend.tms.service.AssignTrainerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,8 +16,8 @@ import java.util.List;
 public class AssignTrainerController {
 
     private final AssignTrainerService assignTrainerService;
-    @PostMapping("/{batchId}")
-    public ResponseEntity<Object> addTrainersToBatch(@PathVariable Long batchId, @RequestBody List<Long> trainerIds) {
-        return assignTrainerService.addTrainerToBatch(batchId, trainerIds);
+    @PostMapping()
+    public ResponseEntity<Object> addTrainersToBatch(@RequestBody AddTrainerReqModel requestModel) {
+        return assignTrainerService.addTrainerToBatch(requestModel);
     }
 }
