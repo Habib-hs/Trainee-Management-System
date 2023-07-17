@@ -81,9 +81,7 @@ public class CourseServiceImp implements CourseService {
         // Get the course by ID
         Optional<CourseEntity> courseOptional = courseRepository.findById(courseId);
         CourseEntity courseEntity = courseOptional.orElseThrow(() -> new CourseNotFoundException("Course not found with ID: " + courseId));
-
         CourseResModel courseResModel = modelMapper.map(courseEntity, CourseResModel.class);
-
         // Return the course response model
         return new ResponseEntity<>(courseResModel, HttpStatus.OK);
     }
