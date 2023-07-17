@@ -4,7 +4,7 @@ import com.backend.tms.entity.BatchEntity;
 import com.backend.tms.entity.TrainerEntity;
 import com.backend.tms.exception.custom.BatchNotFoundException;
 import com.backend.tms.exception.custom.TrainerNotFoundException;
-import com.backend.tms.model.Trainee.AddTrainerReqModel;
+import com.backend.tms.model.Trainer.AddTrainerReqModel;
 import com.backend.tms.repository.BatchRepository;
 import com.backend.tms.repository.TrainerRepository;
 import com.backend.tms.service.AssignTrainerService;
@@ -14,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Service

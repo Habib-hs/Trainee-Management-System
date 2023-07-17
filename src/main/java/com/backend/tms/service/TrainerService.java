@@ -9,6 +9,7 @@ import java.util.List;
 
 public interface TrainerService {
     ResponseEntity<Object> getAllTrainers();
+    ResponseEntity<Object> getAllTrainer();
     ResponseEntity<Object> getTrainerById(Long trainerId);
     ResponseEntity<Object> updateTrainer(Long trainerId, TrainerUpdateReqModel trainerModel);
     ResponseEntity<Object> deleteTrainer(Long trainerId);

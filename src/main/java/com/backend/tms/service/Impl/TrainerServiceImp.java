@@ -1,9 +1,11 @@
 package com.backend.tms.service.Impl;
 
+import com.backend.tms.entity.TraineeEntity;
 import com.backend.tms.entity.TrainerEntity;
 import com.backend.tms.exception.custom.TrainerNotFoundException;
 import com.backend.tms.model.Trainer.TrainerResModel;
 import com.backend.tms.model.Trainer.TrainerUpdateReqModel;
+import com.backend.tms.repository.BatchRepository;
 import com.backend.tms.repository.TrainerRepository;
 import com.backend.tms.service.TrainerService;
 import lombok.RequiredArgsConstructor;
@@ -16,19 +18,39 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class TrainerServiceImp implements TrainerService {
     private final ModelMapper modelMapper;
     private final TrainerRepository trainerRepository;
+    private final BatchRepository batchRepository;
     @Override
     public ResponseEntity<Object> getAllTrainers() {
         List<TrainerEntity> trainerEntityList = trainerRepository.findAll();
         //create a response object
         Map<String, Object> response = new HashMap<>();
         response.put("Total Trainer", trainerEntityList.size());
-        response.put("Trainees", trainerEntityList);
+        response.put("Trainer", trainerEntityList);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<Object> getAllTrainer() {
+        List<Long> assignedTrainerIds = batchRepository.findAll().stream()
+                .flatMap(batch -> batch.getTrainers().stream())
+                .map(TrainerEntity::getId)
+                .collect(Collectors.toList());
+
+        List<TrainerEntity> unassignedTrainer = trainerRepository.findAll().stream()
+                .filter(trainer -> !assignedTrainerIds.contains(trainer.getId()))
+                .collect(Collectors.toList());
+
+        // Create a response object
+        Map<String, Object> response = new HashMap<>();
+        response.put("Total Trainer", unassignedTrainer.size());
+        response.put("Trainer", unassignedTrainer);
         return new ResponseEntity<>(response, HttpStatus.OK);
 
     }

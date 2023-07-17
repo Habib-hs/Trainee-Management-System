@@ -20,6 +20,12 @@ public class TrainerController {
         return trainerService.getAllTrainers();
     }
 
+    @GetMapping("/get/all")
+    public ResponseEntity<Object> getAllTrainer() {
+        return trainerService.getAllTrainer();
+    }
+
+
     @GetMapping("/{id}")
     public ResponseEntity<Object> getTrainerById(@PathVariable("id") Long trainerId) {
         return trainerService.getTrainerById(trainerId);

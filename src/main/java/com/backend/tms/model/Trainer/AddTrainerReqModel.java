@@ -1,4 +1,4 @@
-package com.backend.tms.model.Trainee;
+package com.backend.tms.model.Trainer;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
