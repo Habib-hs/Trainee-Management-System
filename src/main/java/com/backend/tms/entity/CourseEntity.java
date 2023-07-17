@@ -14,16 +14,12 @@ import java.util.Date;
 @AllArgsConstructor
 @Builder
 public class CourseEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    private String type;
     private String description;
     private Long assignedTrainerId;
     private String trainerName;
-    private Date startDate;
-    private Date endDate;
 
 }
