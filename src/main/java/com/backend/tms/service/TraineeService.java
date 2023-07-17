@@ -10,4 +10,5 @@ public interface TraineeService {
     ResponseEntity<Object> getTraineeById(Long traineeId);
     ResponseEntity<Object> updateTrainee(Long traineeId, TraineeReqModel traineeModel);
     ResponseEntity<Object> deleteTrainee(Long traineeId);
+
 }
