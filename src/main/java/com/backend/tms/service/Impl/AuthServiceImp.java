@@ -74,7 +74,6 @@ public class AuthServiceImp implements AuthService {
         if (userEntityByEmail != null) {
             throw new TraineeAlreadyExistsException("User already exists with the given email");
         }
-
         // Create a new UserEntity
         UserEntity userTrainee = UserEntity.builder()
                 .id(traineeModel.getId()) // Set the ID explicitly
