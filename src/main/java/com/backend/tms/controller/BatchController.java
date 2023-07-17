@@ -15,7 +15,7 @@ public class BatchController {
 
     private final BatchService batchService;
 
-    @PostMapping("/create")
+    @PostMapping("/")
     public ResponseEntity<Object> createBatch(@RequestBody BatchReqModel batchModel) {
         return batchService.createBatch(batchModel);
 
@@ -35,7 +35,6 @@ public class BatchController {
     public ResponseEntity<Object> updateBatch(@PathVariable("id") Long batchId, @RequestBody BatchReqModel batchModel) {
         return batchService.updateBatch(batchId, batchModel);
     }
-
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Object>deleteBatch(@PathVariable("id") Long batchId) {

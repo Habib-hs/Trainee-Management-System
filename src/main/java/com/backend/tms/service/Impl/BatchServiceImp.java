@@ -14,7 +14,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @Service
@@ -57,18 +59,13 @@ public class BatchServiceImp implements BatchService {
         // Retrieve all batches from the repository
         List<BatchEntity> batchEntities = batchRepository.findAll();
 
-        // Create a list to store BatchReqModels
-        List<BatchResModel> batchModels = new ArrayList<>();
-
-        // Iterate over each BatchEntity and map it to BatchReqModel
-        for (BatchEntity batchEntity : batchEntities) {
-            BatchResModel batchModel = modelMapper.map(batchEntity, BatchResModel.class);
-            batchModels.add(batchModel);
-        }
-
-        // Return the list of BatchReqModels
-        return new ResponseEntity<>(batchModels, HttpStatus.OK);
+        // Create a response object
+        Map<String, Object> response = new HashMap<>();
+        response.put("Total Batch", batchEntities.size());
+        response.put("Batches", batchEntities);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
 
     @Override
     public ResponseEntity<Object> updateBatch(Long batchId, BatchReqModel batchModel) {
