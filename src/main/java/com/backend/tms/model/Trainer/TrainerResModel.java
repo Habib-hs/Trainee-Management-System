@@ -11,5 +11,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class TrainerResModel {
-    private String message;
+    private String fullName;
+    private String email;
+    private String profilePicture;
+    private String designation;
+    private String joiningDate;
+    private int yearsOfExperience;
+    private String expertises;
+    private String contactNumber;
+    private String presentAddress;
 }
