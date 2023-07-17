@@ -15,7 +15,6 @@ import java.util.List;
 public class AssignTrainerController {
 
     private final AssignTrainerService assignTrainerService;
-
     @PostMapping("/{batchId}")
     public ResponseEntity<Object> addTrainersToBatch(@PathVariable Long batchId, @RequestBody List<Long> trainerIds) {
         return assignTrainerService.addTrainerToBatch(batchId, trainerIds);
