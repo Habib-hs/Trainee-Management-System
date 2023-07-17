@@ -64,13 +64,7 @@ public class AuthServiceImp implements AuthService {
 
         // Save the AdminEntity
         adminRepository.save(admin);
-
-        // Map the saved AdminEntity to AdminResModel
-        AdminResModel adminResModel = AuthMapper.adminEntityResModel(admin);
-
-        // Return the AdminResModel as the response
-        return new ResponseEntity<>(adminResModel, HttpStatus.OK);
-
+        return new ResponseEntity<>("admin created successfully", HttpStatus.OK);
     }
 
     @Override
