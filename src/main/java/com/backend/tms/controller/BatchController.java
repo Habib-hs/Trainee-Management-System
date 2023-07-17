@@ -15,10 +15,9 @@ public class BatchController {
 
     private final BatchService batchService;
 
-    @PostMapping("/")
+    @PostMapping()
     public ResponseEntity<Object> createBatch(@RequestBody BatchReqModel batchModel) {
         return batchService.createBatch(batchModel);
-
     }
 
     @GetMapping("/get/all")

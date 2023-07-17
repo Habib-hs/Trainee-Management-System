@@ -30,7 +30,8 @@ public class BatchServiceImp implements BatchService {
         String batchName = batchModel.getBatchName();
         BatchEntity existingBatch = batchRepository.findByBatchName(batchName);
         if (existingBatch != null) {
-           throw new BatchAlreadyExistsException("Batch Already exist with the same name!");
+          // throw new BatchAlreadyExistsException("Batch Already exist with the same name!");
+            return new ResponseEntity<>("Batch already exist", HttpStatus.BAD_REQUEST);
         }
 
         // Create a new BatchEntity
