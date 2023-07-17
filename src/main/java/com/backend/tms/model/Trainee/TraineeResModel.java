@@ -10,6 +10,18 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class TraineeResModel {
-    private String message;
+    private Long id;
+    private String email;
+    private String domain;
+    private String fullName;
+    private String profilePicture;
+    private String gender;
+    private String dateOfBirth;
+    private String contactNumber;
+    private String degreeName;
+    private String educationalInstitute;
+    private double cgpa;
+    private int passingYear;
+    private String presentAddress;
 
 }
