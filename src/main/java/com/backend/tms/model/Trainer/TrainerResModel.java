@@ -11,5 +11,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class TrainerResModel {
-    private  String message;
+    private String message;
 }
