@@ -1,14 +1,12 @@
 package com.backend.tms.service.Impl;
 
-import com.backend.tms.entity.CourseEntity;
+
+import com.backend.tms.entity.BatchEntity;
 import com.backend.tms.entity.TraineeEntity;
-import com.backend.tms.exception.custom.BatchNotFoundException;
-import com.backend.tms.exception.custom.CourseNotFoundException;
 import com.backend.tms.exception.custom.TraineeNotFoundException;
-import com.backend.tms.model.Course.CourseResModel;
-import com.backend.tms.model.Trainee.TraineeReqModel;
 import com.backend.tms.model.Trainee.TraineeResModel;
 import com.backend.tms.model.Trainee.TraineeUpdateReqModel;
+import com.backend.tms.repository.BatchRepository;
 import com.backend.tms.repository.TraineeRepository;
 import com.backend.tms.service.TraineeService;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -29,6 +28,7 @@ public class TraineeServiceImp implements TraineeService {
 
     private final TraineeRepository traineeRepository;
     private final ModelMapper modelMapper;
+    private final BatchRepository batchRepository;
 
     @Override
     public ResponseEntity<Object> getAllTrainees() {
@@ -39,6 +39,26 @@ public class TraineeServiceImp implements TraineeService {
         response.put("Trainees", traineeEntityList);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @Override
+    public ResponseEntity<Object> getAllTrainee() {
+        List<Long> assignedTraineeIds = batchRepository.findAll().stream()
+                .flatMap(batch -> batch.getTrainees().stream())
+                .map(TraineeEntity::getId)
+                .collect(Collectors.toList());
+
+        List<TraineeEntity> unassignedTrainees = traineeRepository.findAll().stream()
+                .filter(trainee -> !assignedTraineeIds.contains(trainee.getId()))
+                .collect(Collectors.toList());
+
+        // Create a response object
+        Map<String, Object> response = new HashMap<>();
+        response.put("Total Trainee", unassignedTrainees.size());
+        response.put("Trainees", unassignedTrainees);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+
 
     @Override
     public ResponseEntity<Object> getTraineeById(Long traineeId) {

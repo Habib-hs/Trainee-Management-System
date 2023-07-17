@@ -14,9 +14,14 @@ import java.util.List;
 public class TraineeController {
     private final TraineeService traineeService;
 
-    @GetMapping("/all")
+    @GetMapping("/get/all")
     public ResponseEntity<Object> getAllTrainees() {
         return traineeService.getAllTrainees();
+    }
+
+    @GetMapping("/gets/all")
+    public ResponseEntity<Object> getAllTrainee() {
+        return traineeService.getAllTrainee();
     }
 
     @GetMapping("/{id}")
