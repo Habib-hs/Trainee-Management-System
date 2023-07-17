@@ -1,4 +1,10 @@
 package com.backend.tms.service;
 
-public class TraineeService {
+import com.backend.tms.model.Trainee.TraineeReqModel;
+import org.springframework.http.ResponseEntity;
+
+import java.util.List;
+
+public interface TraineeService {
+
 }

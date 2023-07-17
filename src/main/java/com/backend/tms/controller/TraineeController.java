@@ -15,7 +15,7 @@ public class TraineeController {
     private final TraineeService traineeService;
 
     @GetMapping("/all")
-    public ResponseEntity<List<TraineeReqModel>> getAllTrainees() {
+    public ResponseEntity<Object> getAllTrainees() {
         return traineeService.getAllTrainees();
     }
 
