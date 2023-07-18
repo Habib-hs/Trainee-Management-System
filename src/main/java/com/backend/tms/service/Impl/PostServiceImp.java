@@ -40,7 +40,6 @@ public class PostServiceImp implements PostService {
 
     @Override
     public ResponseEntity<Object> createPost(PostReqModel postModel) {
-
         try{
             // Validate if the associated batch exists
             BatchEntity batchEntity = batchRepository.findById(postModel.getBatchId())

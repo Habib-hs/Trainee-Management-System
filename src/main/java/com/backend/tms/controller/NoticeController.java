@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class NoticeController {
     private final NoticeService noticeService;
-    @PostMapping("/")
+    @PostMapping()
     public ResponseEntity<Object> createNotice(@ModelAttribute NoticeReqModel noticeModel) {
         return noticeService.createNotice(noticeModel);
 
