@@ -1,10 +1,9 @@
 package com.backend.tms.service.Impl;
 
-import com.backend.tms.entity.AssignmentEntity;
 import com.backend.tms.entity.BatchEntity;
 import com.backend.tms.entity.PostEntity;
 import com.backend.tms.entity.TrainerEntity;
-import com.backend.tms.exception.custom.AssignmentNotFoundException;
+import org.apache.commons.io.FileUtils;
 import com.backend.tms.exception.custom.BatchNotFoundException;
 import com.backend.tms.exception.custom.PostNotFoundException;
 import com.backend.tms.exception.custom.TrainerNotFoundException;
@@ -15,6 +14,7 @@ import com.backend.tms.repository.PostRepository;
 import com.backend.tms.repository.TrainerRepository;
 import com.backend.tms.service.PostService;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.FileUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +23,9 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 @Service
 @RequiredArgsConstructor
@@ -108,6 +110,30 @@ public class PostServiceImp implements PostService {
             return ResponseEntity.status(HttpStatus.OK).body("Post updated successfully");
         }catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update post");
+        }
+    }
+
+    @Override
+    public ResponseEntity<Object> downloadPostFile(Long postId) {
+        PostEntity postEntity = postRepository.findById(postId).orElseThrow(()->new PostNotFoundException("post not found"));
+       // if(postEntity.getFileUrl()==null){throw FileNotFoundException("File not found for download")}
+       // }
+       try{
+           File file = new File(postEntity.getFileUrl());
+           String fileContents = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
+
+           // Create a new file in the specified directory
+           String fileName = StringUtils.cleanPath(file.getName());
+           File destinationDir = new File(DOWNLOAD_DIR);
+           if (!destinationDir.exists()) {
+               destinationDir.mkdirs(); // Create the directory if it doesn't exist
+           }
+           File destinationFile = new File(destinationDir, fileName);
+           FileUtils.writeStringToFile(destinationFile, fileContents, StandardCharsets.UTF_8);
+           String message = "Download successful. File saved to: " + destinationFile.getAbsolutePath();
+           return ResponseEntity.ok(message);
+       }catch(Exception e){
+           return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to read or save the file");
         }
     }
 
