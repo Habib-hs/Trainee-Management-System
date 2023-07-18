@@ -17,6 +17,11 @@ import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
@@ -26,28 +31,40 @@ public class PostServiceImp implements PostService {
     private final TrainerRepository trainerRepository;
     private final ModelMapper modelMapper;
 
+    private static final String UPLOAD_DIR = "D:\\TMS FILE FOR POSTS";
+    private static final String DOWNLOAD_DIR = "D:\\TMS FILE DOWNLOAD FOR POSTS";
+
     @Override
     public ResponseEntity<Object> createPost(PostReqModel postModel) {
-        // Validate if the associated batch exists
-        BatchEntity batch = batchRepository.findById(postModel.getBatchId())
-                .orElseThrow(() -> new BatchNotFoundException("Batch not found"));
 
-        // Validate if the associated trainer exists
-        TrainerEntity trainer = trainerRepository.findById(postModel.getTrainerId())
-                .orElseThrow(() -> new TrainerNotFoundException("Trainer not found"));
+        try{
+            // Validate if the associated batch exists
+            BatchEntity batchEntity = batchRepository.findById(postModel.getBatchId())
+                    .orElseThrow(() -> new BatchNotFoundException("Batch not found"));
 
-        // Map PostReqModel to PostEntity
-        PostEntity postEntity = modelMapper.map(postModel, PostEntity.class);
+            // Validate if the associated trainer exists
+            TrainerEntity trainerEntity = trainerRepository.findById(postModel.getTrainerId())
+                    .orElseThrow(() -> new TrainerNotFoundException("Trainer not found"));
 
-        // Save the post to the PostRepository
-        PostEntity createdPost = postRepository.save(postEntity);
+            MultipartFile file = postModel.getFile();
+            String fileUrl=null;
 
-        // Add the created post to the classroom
-        trainer.getPosts().add(createdPost);
-        trainerRepository.save(trainer);
+            if (!file.isEmpty()) {
+                fileUrl = uploadFile(file);
+            }
+            PostEntity postEntity = modelMapper.map(postModel, PostEntity.class);
+            if (fileUrl != null) {
+                postEntity.setFileUrl(fileUrl);
+            }
+            PostEntity createdPost = postRepository.save(postEntity);
+            trainerEntity.getPosts().add(createdPost);
+            return ResponseEntity.status(HttpStatus.CREATED).body("Post created successfully");
 
-        return ResponseEntity.status(HttpStatus.CREATED).body("Post created successfully");
+        }catch(Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to create assignment");
+        }
     }
+
 
     @Override
     public ResponseEntity<Object> getPost(Long postId) {
@@ -80,7 +97,7 @@ public class PostServiceImp implements PostService {
 
             existingPost.setPostTitle(postModel.getPostTitle());
             existingPost.setPostBody(postModel.getPostBody());
-            existingPost.setAttachment(postModel.getAttachment());
+           // existingPost.setFileUrl(postModel.getFile());
 
             postRepository.save(existingPost);
 
@@ -92,6 +109,24 @@ public class PostServiceImp implements PostService {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update post");
         }
+    }
+
+    private String uploadFile(MultipartFile file) {
+        if (file != null && !file.isEmpty()) {
+            try {
+                String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+                File destinationDir = new File(UPLOAD_DIR);
+                if (!destinationDir.exists()) {
+                    destinationDir.mkdirs(); // Create the directory if it doesn't exist
+                }
+                File destinationFile = new File(destinationDir, fileName);
+                file.transferTo(destinationFile);
+                return destinationFile.getAbsolutePath();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
     }
 
 }
