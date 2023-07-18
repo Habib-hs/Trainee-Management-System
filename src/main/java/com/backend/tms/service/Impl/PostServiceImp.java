@@ -1,8 +1,10 @@
 package com.backend.tms.service.Impl;
 
+import com.backend.tms.entity.AssignmentEntity;
 import com.backend.tms.entity.BatchEntity;
 import com.backend.tms.entity.PostEntity;
 import com.backend.tms.entity.TrainerEntity;
+import com.backend.tms.exception.custom.AssignmentNotFoundException;
 import com.backend.tms.exception.custom.BatchNotFoundException;
 import com.backend.tms.exception.custom.PostNotFoundException;
 import com.backend.tms.exception.custom.TrainerNotFoundException;
@@ -85,28 +87,26 @@ public class PostServiceImp implements PostService {
     @Override
     public ResponseEntity<Object> updatePost(Long postId, PostReqModel postModel) {
         try {
-            PostEntity existingPost = postRepository.findById(postId)
-                    .orElseThrow(() -> new PostNotFoundException("Post not found"));
+            PostEntity postEntity = postRepository.findById(postId)
+                    .orElseThrow(() -> new PostNotFoundException("Post not found with ID: " + postId));
 
-            if (postModel.getPostTitle() == null || postModel.getPostTitle().isEmpty()) {
-                throw new IllegalArgumentException("Post title is required");
+            //updating the post Entity
+            postEntity.setPostTitle(postModel.getPostTitle());
+            postEntity.setPostBody(postModel.getPostBody());
+            postEntity.setBatchId(postModel.getBatchId());
+            postEntity.setTrainerId(postModel.getTrainerId());
+
+            MultipartFile file = postModel.getFile();
+            if (file != null && !file.isEmpty()) {
+                String fileUrl = uploadFile(file);
+                if (fileUrl == null) {
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload the file");
+                }
+                postEntity.setFileUrl(fileUrl);
             }
-            if (postModel.getPostBody() == null || postModel.getPostBody().isEmpty()) {
-                throw new IllegalArgumentException("Post body is required");
-            }
-
-            existingPost.setPostTitle(postModel.getPostTitle());
-            existingPost.setPostBody(postModel.getPostBody());
-           // existingPost.setFileUrl(postModel.getFile());
-
-            postRepository.save(existingPost);
-
+            postRepository.save(postEntity);
             return ResponseEntity.status(HttpStatus.OK).body("Post updated successfully");
-        } catch (PostNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (Exception e) {
+        }catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update post");
         }
     }
