@@ -35,7 +35,7 @@ public class ScheduleBatchServiceImp implements ScheduleBatchService {
             throw new CourseAlreadyExistsException("The course is already Scheduled!");
         }
 
-        if (scheduleBatchModel.getCourseType().equals("common")) {
+        if (scheduleBatchModel.getCourseType().equals("Common")) {
             if (!isCommonCourseTimeValid(scheduleBatchModel)) {
                 return new ResponseEntity<>("Invalid time schedule for common course", HttpStatus.BAD_REQUEST);
             }
@@ -126,16 +126,24 @@ public class ScheduleBatchServiceImp implements ScheduleBatchService {
             scheduleBatchEntity.setCourse(courseEntity);
         }
 
+
         List<Long> batchIds = scheduleBatchModel.getBatchesIds();
         Set<BatchEntity> batchEntities = new HashSet<>();
 
-        for (Long batchId : batchIds) {
-            BatchEntity batch = batchRepository.findById(batchId)
-                    .orElseThrow(() -> new BatchNotFoundException("Batch not found with ID: " + batchId));
-            batchEntities.add(batch);
-        }
+        if (scheduleBatchModel.getCourseType().equals("Common")){
+            List<BatchEntity> batchEntityList = batchRepository.findAll();
+             System.out.println(batchEntityList.size());
+            batchEntities = new HashSet<>(batchEntityList);
+            scheduleBatchEntity.setBatches(batchEntities);
+        }else{
+            for (Long batchId : batchIds) {
+                BatchEntity batch = batchRepository.findById(batchId)
+                        .orElseThrow(() -> new BatchNotFoundException("Batch not found with ID: " + batchId));
+                batchEntities.add(batch);
+                scheduleBatchEntity.setBatches(batchEntities);
+            }
 
-        scheduleBatchEntity.setBatches(batchEntities);
+        }
         return scheduleBatchEntity;
     }
 }
