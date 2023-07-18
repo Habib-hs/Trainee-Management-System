@@ -31,6 +31,4 @@ public class PostController {
         return postService.downloadPostFile(postId);
     }
 
-
-
 }

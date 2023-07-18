@@ -56,4 +56,19 @@ public class NoticeServiceImp implements NoticeService {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to create Notice");
         }
     }
+
+    @Override
+    public ResponseEntity<Object> getNotice(Long noticeId) {
+        return null;
+    }
+
+    @Override
+    public ResponseEntity<Object> updateNotice(Long noticeId, NoticeReqModel noticeModel) {
+        return null;
+    }
+
+    @Override
+    public ResponseEntity<Object> downloadNoticeFile(Long noticeId) {
+        return null;
+    }
 }
