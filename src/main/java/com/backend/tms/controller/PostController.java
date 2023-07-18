@@ -1,5 +1,6 @@
 package com.backend.tms.controller;
 
+import com.backend.tms.model.Classroom.PostMessageReqModel;
 import com.backend.tms.model.Classroom.PostReqModel;
 import com.backend.tms.service.PostService;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,13 @@ public class PostController {
     public ResponseEntity<Object> createPost(@ModelAttribute PostReqModel postModel) {
         return postService.createPost(postModel);
     }
+
+    @PostMapping("/message")
+    public ResponseEntity<Object> createPostMessage(@RequestBody PostMessageReqModel postModel) {
+        return postService.createPostMessage(postModel);
+    }
+
+
     @GetMapping("/{id}")
     public ResponseEntity<Object> getPost(@PathVariable("id") Long postId) {
         return postService.getPost(postId);

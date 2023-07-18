@@ -3,6 +3,7 @@ package com.backend.tms.service.Impl;
 import com.backend.tms.entity.BatchEntity;
 import com.backend.tms.entity.PostEntity;
 import com.backend.tms.entity.TrainerEntity;
+import com.backend.tms.model.Classroom.PostMessageReqModel;
 import org.apache.commons.io.FileUtils;
 import com.backend.tms.exception.custom.BatchNotFoundException;
 import com.backend.tms.exception.custom.PostNotFoundException;
@@ -39,8 +40,8 @@ public class PostServiceImp implements PostService {
     private static final String DOWNLOAD_DIR = "D:\\TMS FILE DOWNLOAD FOR POSTS";
 
     @Override
-    public ResponseEntity<Object> createPost(PostReqModel postModel) {
-        try{
+    public ResponseEntity<Object> createPost( PostReqModel postModel) {
+        try {
             // Validate if the associated batch exists
             BatchEntity batchEntity = batchRepository.findById(postModel.getBatchId())
                     .orElseThrow(() -> new BatchNotFoundException("Batch not found"));
@@ -50,9 +51,9 @@ public class PostServiceImp implements PostService {
                     .orElseThrow(() -> new TrainerNotFoundException("Trainer not found"));
 
             MultipartFile file = postModel.getFile();
-            String fileUrl=null;
+            String fileUrl = null;
 
-            if (!file.isEmpty()) {
+            if (file != null && !file.isEmpty()) {
                 fileUrl = uploadFile(file);
             }
             PostEntity postEntity = modelMapper.map(postModel, PostEntity.class);
@@ -61,9 +62,13 @@ public class PostServiceImp implements PostService {
             }
             PostEntity createdPost = postRepository.save(postEntity);
             trainerEntity.getPosts().add(createdPost);
-            return ResponseEntity.status(HttpStatus.CREATED).body("Post created successfully");
 
-        }catch(Exception e) {
+            return ResponseEntity.status(HttpStatus.CREATED).body("Post created successfully");
+        } catch (BatchNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (TrainerNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to create post");
         }
     }
@@ -134,6 +139,22 @@ public class PostServiceImp implements PostService {
        }catch(Exception e){
            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to read or save the file");
         }
+    }
+
+    @Override
+    public ResponseEntity<Object> createPostMessage(PostMessageReqModel postModel) {
+        // Validate if the associated batch exists
+        BatchEntity batchEntity = batchRepository.findById(postModel.getBatchId())
+                .orElseThrow(() -> new BatchNotFoundException("Batch not found"));
+
+        // Validate if the associated trainer exists
+        TrainerEntity trainerEntity = trainerRepository.findById(postModel.getTrainerId())
+                .orElseThrow(() -> new TrainerNotFoundException("Trainer not found"));
+
+        PostEntity postEntity = modelMapper.map(postModel, PostEntity.class);
+        PostEntity createdPost = postRepository.save(postEntity);
+        trainerEntity.getPosts().add(createdPost);
+        return ResponseEntity.status(HttpStatus.CREATED).body("Post created successfully");
     }
 
     private String uploadFile(MultipartFile file) {
