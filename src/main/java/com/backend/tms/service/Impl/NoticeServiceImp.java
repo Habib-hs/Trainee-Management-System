@@ -4,10 +4,7 @@ import com.backend.tms.entity.BatchEntity;
 import com.backend.tms.entity.NoticeEntity;
 import com.backend.tms.entity.PostEntity;
 import com.backend.tms.entity.TrainerEntity;
-import com.backend.tms.exception.custom.BatchNotFoundException;
-import com.backend.tms.exception.custom.NoticeNotFoundException;
-import com.backend.tms.exception.custom.PostNotFoundException;
-import com.backend.tms.exception.custom.TrainerNotFoundException;
+import com.backend.tms.exception.custom.*;
 import com.backend.tms.model.Classroom.NoticeReqModel;
 import com.backend.tms.model.Classroom.NoticeResModel;
 import com.backend.tms.model.Classroom.PostResModel;
@@ -18,11 +15,16 @@ import com.backend.tms.service.NoticeService;
 import com.backend.tms.utlis.AppConstants;
 import com.backend.tms.utlis.FileService;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.FileUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.nio.charset.StandardCharsets;
 
 @Service
 @RequiredArgsConstructor
@@ -76,11 +78,51 @@ public class NoticeServiceImp implements NoticeService {
 
     @Override
     public ResponseEntity<Object> updateNotice(Long noticeId, NoticeReqModel noticeModel) {
-        return null;
+        try {
+            NoticeEntity noticeEntity = noticeRepository.findById(noticeId)
+                    .orElseThrow(() -> new NoticeNotFoundException("Notice not found with ID: " + noticeId));
+
+            //updating the post Entity
+            noticeEntity.setNoticeTitle(noticeModel.getNoticeTitle());
+            noticeEntity.setBatchId(noticeModel.getBatchId());
+            noticeEntity.setTrainerId(noticeModel.getTrainerId());
+
+            MultipartFile file = noticeModel.getFile();
+            if (file != null && !file.isEmpty()) {
+                String fileUrl = FileService.uploadFile(file,AppConstants.NOTICE_UPLOAD_DIR);
+                if (fileUrl == null) {
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload the file");
+                }
+                noticeEntity.setFileUrl(fileUrl);
+            }
+            noticeRepository.save(noticeEntity);
+            return ResponseEntity.status(HttpStatus.OK).body("Notice updated successfully");
+        }catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update Notice");
+        }
     }
 
     @Override
     public ResponseEntity<Object> downloadNoticeFile(Long noticeId) {
-        return null;
+        NoticeEntity noticeEntity = noticeRepository.findById(noticeId).orElseThrow(() -> new NoticeNotFoundException("Notice not found with ID: " + noticeId));
+        if(noticeEntity.getFileUrl()==null){throw new FileNotFoundException("File not found for download");}
+
+        try{
+            File file = new File(noticeEntity.getFileUrl());
+            String fileContents = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
+
+            // Create a new file in the specified directory
+            String fileName = StringUtils.cleanPath(file.getName());
+            File destinationDir = new File(AppConstants.NOTICE_DOWNLOAD_DIR);
+            if (!destinationDir.exists()) {
+                destinationDir.mkdirs(); // Create the directory if it doesn't exist
+            }
+            File destinationFile = new File(destinationDir, fileName);
+            FileUtils.writeStringToFile(destinationFile, fileContents, StandardCharsets.UTF_8);
+            String message = "Download successful. File saved to: " + destinationFile.getAbsolutePath();
+            return ResponseEntity.ok(message);
+        }catch(Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to read or save the file");
+        }
     }
 }

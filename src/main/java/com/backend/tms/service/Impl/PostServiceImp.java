@@ -64,7 +64,7 @@ public class PostServiceImp implements PostService {
             return ResponseEntity.status(HttpStatus.CREATED).body("Post created successfully");
 
         }catch(Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to create assignment");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to create post");
         }
     }
 

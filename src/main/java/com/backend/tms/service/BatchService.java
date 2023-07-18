@@ -9,5 +9,6 @@ public interface BatchService {
     ResponseEntity<Object> updateBatch(Long batchId, BatchReqModel batchModel);
     ResponseEntity<Object> deleteBatch(Long batchId);
     ResponseEntity<Object> getAllBatches();
+    public ResponseEntity<Object> getAllBatchName();
 
 }

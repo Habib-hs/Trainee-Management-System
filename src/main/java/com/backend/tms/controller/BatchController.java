@@ -12,9 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/batch")
 @RequiredArgsConstructor
 public class BatchController {
-
     private final BatchService batchService;
-
     @PostMapping()
     public ResponseEntity<Object> createBatch(@RequestBody BatchReqModel batchModel) {
         return batchService.createBatch(batchModel);
@@ -23,6 +21,11 @@ public class BatchController {
     @GetMapping("/get/all")
     public ResponseEntity<Object> getAllBatches() {
         return batchService.getAllBatches();
+    }
+
+    @GetMapping("/get/allName")
+    public ResponseEntity<Object> getAllBatchName() {
+        return batchService.getAllBatchName();
     }
 
     @GetMapping("/get/{id}")
@@ -36,8 +39,7 @@ public class BatchController {
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Object>deleteBatch(@PathVariable("id") Long batchId) {
+    public ResponseEntity<Object> deleteBatch(@PathVariable("id") Long batchId) {
         return batchService.deleteBatch(batchId);
     }
-
 }
