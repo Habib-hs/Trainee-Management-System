@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @NoArgsConstructor
@@ -15,5 +16,5 @@ public class NoticeReqModel {
     private String NoticeTitle;
     private Long BatchId;
     private Long trainerId;
-    private String attachment;
+    private MultipartFile file;
 }
