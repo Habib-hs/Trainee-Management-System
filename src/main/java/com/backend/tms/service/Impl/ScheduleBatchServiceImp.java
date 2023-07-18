@@ -132,7 +132,7 @@ public class ScheduleBatchServiceImp implements ScheduleBatchService {
 
         if (scheduleBatchModel.getCourseType().equals("Common")){
             List<BatchEntity> batchEntityList = batchRepository.findAll();
-             System.out.println(batchEntityList.size());
+            // System.out.println(batchEntityList.size());
             batchEntities = new HashSet<>(batchEntityList);
             scheduleBatchEntity.setBatches(batchEntities);
         }else{

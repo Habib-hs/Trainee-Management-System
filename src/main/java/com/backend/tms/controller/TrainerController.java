@@ -25,6 +25,10 @@ public class TrainerController {
         return trainerService.getAllTrainer();
     }
 
+    @GetMapping("/get/allName")
+    public ResponseEntity<Object> getTrainerIdAndName(){
+        return trainerService.getTrainerIdAndName();
+    };
 
     @GetMapping("/{id}")
     public ResponseEntity<Object> getTrainerById(@PathVariable("id") Long trainerId) {

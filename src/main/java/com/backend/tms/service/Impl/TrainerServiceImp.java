@@ -14,10 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -54,6 +51,30 @@ public class TrainerServiceImp implements TrainerService {
         return new ResponseEntity<>(response, HttpStatus.OK);
 
     }
+
+    @Override
+    public ResponseEntity<Object> getTrainerIdAndName() {
+        List<TrainerEntity> trainerEntityList = trainerRepository.findAll();
+
+        // Create a response object
+        List<Map<String, Object>> trainers = new ArrayList<>();
+
+        // Iterate over each trainer and extract the name and ID
+        for (TrainerEntity trainer : trainerEntityList) {
+            Map<String, Object> trainerData = new HashMap<>();
+            trainerData.put("id", trainer.getId());
+            trainerData.put("name", trainer.getFullName());
+            trainers.add(trainerData);
+        }
+
+        // Create the final response
+        Map<String, Object> response = new HashMap<>();
+        response.put("Total Trainer", trainers.size());
+        response.put("Trainers", trainers);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
 
     @Override
     public ResponseEntity<Object> getTrainerById(Long trainerId) {

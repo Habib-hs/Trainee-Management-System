@@ -13,4 +13,6 @@ public interface TrainerService {
     ResponseEntity<Object> getTrainerById(Long trainerId);
     ResponseEntity<Object> updateTrainer(Long trainerId, TrainerUpdateReqModel trainerModel);
     ResponseEntity<Object> deleteTrainer(Long trainerId);
+
+    ResponseEntity<Object> getTrainerIdAndName();
 }
