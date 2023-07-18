@@ -12,8 +12,10 @@ import org.springframework.stereotype.Service;
 public class NoticeServiceImp implements NoticeService {
     private final NoticeRepository noticeRepository;
 
+
+
     @Override
     public ResponseEntity<Object> createNotice(NoticeReqModel noticeReqModel) {
-        return null;
+    return null;
     }
 }
