@@ -23,6 +23,7 @@ public class GlobalExceptionHandler {
             AssignmentNotFoundException.class,
             PostNotFoundException.class,
             IllegalArgumentException.class,
+            FileNotFoundException.class,
             CommentNotFoundException.class
 
     })
@@ -51,6 +52,8 @@ public class GlobalExceptionHandler {
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
         }else if (ex instanceof  IllegalArgumentException){
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        }else if (ex instanceof  FileNotFoundException){
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
         }else{
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
