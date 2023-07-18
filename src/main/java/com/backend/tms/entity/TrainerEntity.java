@@ -49,6 +49,11 @@ public class TrainerEntity {
     @OneToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
     private Set<PostEntity> posts = new HashSet<>();
 
+    //relationship with notice
+    @Builder.Default
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private Set<NoticeEntity> notices = new HashSet<>();
+
     //hashcode compare
     @Override
     public boolean equals(Object o) {
