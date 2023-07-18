@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.*;
 public class PostController {
     private final PostService postService;
 
-    @PostMapping("/create")
-    public ResponseEntity<Object> createPost(@RequestBody PostReqModel postModel) {
+    @PostMapping()
+    public ResponseEntity<Object> createPost(@ModelAttribute PostReqModel postModel) {
         return postService.createPost(postModel);
     }
     @GetMapping("/{id}")
