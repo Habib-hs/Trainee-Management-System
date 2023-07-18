@@ -7,7 +7,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class FileService {
-    private String uploadFile(MultipartFile file, String UPLOAD_DIR) {
+    public String uploadFile(MultipartFile file, String UPLOAD_DIR) {
         if (file != null && !file.isEmpty()) {
             try {
                 String fileName = StringUtils.cleanPath(file.getOriginalFilename());
