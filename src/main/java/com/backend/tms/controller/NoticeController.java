@@ -1,5 +1,6 @@
 package com.backend.tms.controller;
 
+import com.backend.tms.model.Classroom.NoticeNoFileReqModel;
 import com.backend.tms.model.Classroom.NoticeReqModel;
 import com.backend.tms.model.Classroom.PostReqModel;
 import com.backend.tms.service.NoticeService;
@@ -17,12 +18,17 @@ public class NoticeController {
         return noticeService.createNotice(noticeModel);
     }
 
+    @PostMapping("/create")
+    public ResponseEntity<Object> noticeCreate(@RequestBody NoticeNoFileReqModel noticeModel) {
+        return noticeService.noticeCreate(noticeModel);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<Object> getNotice(@PathVariable("id") Long noticeId) {
         return noticeService.getNotice(noticeId);
     }
 
-    @PutMapping("update/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<Object> updateNotice(@PathVariable("id") Long noticeId, @ModelAttribute NoticeReqModel noticeModel) {
         return noticeService.updateNotice(noticeId, noticeModel);
     }

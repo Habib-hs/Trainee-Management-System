@@ -5,6 +5,7 @@ import com.backend.tms.entity.NoticeEntity;
 import com.backend.tms.entity.PostEntity;
 import com.backend.tms.entity.TrainerEntity;
 import com.backend.tms.exception.custom.*;
+import com.backend.tms.model.Classroom.NoticeNoFileReqModel;
 import com.backend.tms.model.Classroom.NoticeReqModel;
 import com.backend.tms.model.Classroom.NoticeResModel;
 import com.backend.tms.model.Classroom.PostResModel;
@@ -61,6 +62,22 @@ public class NoticeServiceImp implements NoticeService {
         }catch(Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to create Notice");
         }
+    }
+
+    @Override
+    public ResponseEntity<Object> noticeCreate(NoticeNoFileReqModel noticeModel) {
+        // Validate if the associated batch exists
+        BatchEntity batchEntity = batchRepository.findById(noticeModel.getBatchId())
+                .orElseThrow(() -> new BatchNotFoundException("Batch not found"));
+
+        // Validate if the associated trainer exists
+        TrainerEntity trainerEntity = trainerRepository.findById(noticeModel.getTrainerId())
+                .orElseThrow(() -> new TrainerNotFoundException("Trainer not found"));
+
+        NoticeEntity noticeEntity = modelMapper.map(noticeModel, NoticeEntity.class);
+        NoticeEntity createdNotice = noticeRepository.save(noticeEntity);
+        trainerEntity.getNotices().add(createdNotice);
+        return ResponseEntity.status(HttpStatus.CREATED).body("Notice created successfully");
     }
 
     @Override
@@ -125,4 +142,5 @@ public class NoticeServiceImp implements NoticeService {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to read or save the file");
         }
     }
+
 }
