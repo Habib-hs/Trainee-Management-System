@@ -5,8 +5,12 @@ import com.backend.tms.entity.NoticeEntity;
 import com.backend.tms.entity.PostEntity;
 import com.backend.tms.entity.TrainerEntity;
 import com.backend.tms.exception.custom.BatchNotFoundException;
+import com.backend.tms.exception.custom.NoticeNotFoundException;
+import com.backend.tms.exception.custom.PostNotFoundException;
 import com.backend.tms.exception.custom.TrainerNotFoundException;
 import com.backend.tms.model.Classroom.NoticeReqModel;
+import com.backend.tms.model.Classroom.NoticeResModel;
+import com.backend.tms.model.Classroom.PostResModel;
 import com.backend.tms.repository.BatchRepository;
 import com.backend.tms.repository.NoticeRepository;
 import com.backend.tms.repository.TrainerRepository;
@@ -59,7 +63,15 @@ public class NoticeServiceImp implements NoticeService {
 
     @Override
     public ResponseEntity<Object> getNotice(Long noticeId) {
-        return null;
+        try {
+            NoticeEntity noticeEntity = noticeRepository.findById(noticeId)
+                    .orElseThrow(() -> new NoticeNotFoundException("notice not found"));
+
+            NoticeResModel noticeModel = modelMapper.map(noticeEntity, NoticeResModel.class);
+            return ResponseEntity.ok(noticeModel);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to retrieve post");
+        }
     }
 
     @Override

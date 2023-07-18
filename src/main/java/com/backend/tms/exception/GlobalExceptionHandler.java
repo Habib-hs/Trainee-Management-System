@@ -24,7 +24,8 @@ public class GlobalExceptionHandler {
             PostNotFoundException.class,
             IllegalArgumentException.class,
             FileNotFoundException.class,
-            CommentNotFoundException.class
+            CommentNotFoundException.class,
+            NoticeNotFoundException.class
 
     })
     public ResponseEntity<Object> handleCustomException(Exception ex) {
@@ -54,7 +55,9 @@ public class GlobalExceptionHandler {
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
         }else if (ex instanceof  FileNotFoundException){
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
-        }else{
+        }else if (ex instanceof  NoticeNotFoundException){
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+        } else{
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
