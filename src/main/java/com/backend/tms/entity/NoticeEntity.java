@@ -19,5 +19,5 @@ public class NoticeEntity {
     private String NoticeTitle;
     private Long BatchId;
     private Long trainerId;
-    private String attachment;
+    private String fileUrl;
 }
