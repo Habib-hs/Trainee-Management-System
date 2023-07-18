@@ -7,4 +7,5 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 public interface ScheduleBatchService {
     public ResponseEntity<Object> createScheduleBatch( ScheduleBatchReqModel scheduleBatchModel);
+    ResponseEntity<Object> getScheduleNames();
 }

@@ -63,6 +63,4 @@ public class TrainerEntity {
         return Objects.hash(id);
     }
 
-
-
 }

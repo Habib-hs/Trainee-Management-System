@@ -17,7 +17,6 @@ public class PostController {
     public ResponseEntity<Object> createPost(@RequestBody PostReqModel postModel) {
         return postService.createPost(postModel);
     }
-
     @GetMapping("/{id}")
     public ResponseEntity<Object> getPost(@PathVariable("id") Long postId) {
         return postService.getPost(postId);

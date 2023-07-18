@@ -3,6 +3,7 @@ package com.backend.tms.service.Impl;
 import com.backend.tms.entity.BatchEntity;
 import com.backend.tms.entity.CourseEntity;
 import com.backend.tms.entity.ScheduleBatchEntity;
+import com.backend.tms.entity.TrainerEntity;
 import com.backend.tms.exception.custom.BatchNotFoundException;
 import com.backend.tms.exception.custom.CourseAlreadyExistsException;
 import com.backend.tms.model.ScheduleBatch.ScheduleBatchReqModel;
@@ -54,6 +55,25 @@ public class ScheduleBatchServiceImp implements ScheduleBatchService {
         ScheduleBatchEntity scheduleBatchEntity = mapToScheduleBatchEntity(scheduleBatchModel);
         scheduleRepository.save(scheduleBatchEntity);
         return new ResponseEntity<>("A program scheduled successfully", HttpStatus.CREATED);
+    }
+
+    @Override
+    public ResponseEntity<Object> getScheduleNames() {
+        List<ScheduleBatchEntity> scheduleEntities = scheduleRepository.findAll();
+        // Create a response object
+        List<Map<String, Object>> schedules = new ArrayList<>();
+        for (ScheduleBatchEntity schedule : scheduleEntities) {
+            Map<String, Object> scheduleData = new HashMap<>();
+            scheduleData.put("id", schedule.getId());
+            scheduleData.put("name", schedule.getCourseName());
+            schedules.add(scheduleData);
+        }
+        // Create the final response
+        Map<String, Object> response = new HashMap<>();
+        response.put("Total Schedule", schedules.size());
+        response.put("Schedules", schedules);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+
     }
 
     private boolean isCommonCourseTimeValid(ScheduleBatchReqModel scheduleBatchModel) {

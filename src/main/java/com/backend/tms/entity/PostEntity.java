@@ -23,7 +23,7 @@ public class PostEntity {
     private Long batchId;
     private String postTitle;
     private String postBody;
-    private String attachment;
+    private String fileUrl;
 
     //for the comment relationship
     @Builder.Default

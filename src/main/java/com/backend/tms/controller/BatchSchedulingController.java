@@ -6,10 +6,7 @@ import com.backend.tms.service.ScheduleBatchService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/schedule-batch")
@@ -20,5 +17,10 @@ public class BatchSchedulingController {
     @PostMapping()
     public ResponseEntity<Object> createScheduleBatch(@RequestBody ScheduleBatchReqModel scheduleBatchModel) {
         return scheduleBatchService.createScheduleBatch(scheduleBatchModel);
+    }
+
+    @GetMapping()
+    public ResponseEntity<Object> getScheduleNames(){
+        return scheduleBatchService.getScheduleNames();
     }
 }
