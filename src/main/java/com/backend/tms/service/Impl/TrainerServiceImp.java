@@ -23,6 +23,27 @@ public class TrainerServiceImp implements TrainerService {
     private final ModelMapper modelMapper;
     private final TrainerRepository trainerRepository;
     private final BatchRepository batchRepository;
+
+    @Override
+    public ResponseEntity<Object> updateTrainer(Long trainerId, TrainerUpdateReqModel trainerModel) {
+        // Check if the trainer exists
+        TrainerEntity trainerEntity = trainerRepository.findById(trainerId)
+                .orElseThrow(() -> new TrainerNotFoundException("Trainer not found with ID: " + trainerId));
+
+        //update the trainer Entity
+        trainerEntity.setFullName(trainerModel.getFullName());
+        trainerEntity.setProfilePicture(trainerModel.getProfilePicture());
+        trainerEntity.setDesignation(trainerModel.getDesignation());
+        trainerEntity.setJoiningDate(trainerModel.getJoiningDate());
+        trainerEntity.setYearsOfExperience(trainerModel.getYearsOfExperience());
+        trainerEntity.setExpertises(trainerModel.getExpertises());
+        trainerEntity.setContactNumber(trainerModel.getContactNumber());
+        trainerEntity.setPresentAddress(trainerModel.getPresentAddress());
+        trainerRepository.save(trainerEntity);
+        // Return a success message
+        return new ResponseEntity<>("Trainee updated successfully", HttpStatus.OK);
+
+    }
     @Override
     public ResponseEntity<Object> getAllTrainers() {
         List<TrainerEntity> trainerEntityList = trainerRepository.findAll();
@@ -75,7 +96,6 @@ public class TrainerServiceImp implements TrainerService {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-
     @Override
     public ResponseEntity<Object> getTrainerById(Long trainerId) {
         Optional<TrainerEntity> trainerEntity = trainerRepository.findById(trainerId);
@@ -84,27 +104,6 @@ public class TrainerServiceImp implements TrainerService {
         }
         TrainerResModel trainer = modelMapper.map(trainerEntity, TrainerResModel.class);
         return new ResponseEntity<>(trainer, HttpStatus.OK);
-    }
-
-    @Override
-    public ResponseEntity<Object> updateTrainer(Long trainerId, TrainerUpdateReqModel trainerModel) {
-        // Check if the trainer exists
-        TrainerEntity trainerEntity = trainerRepository.findById(trainerId)
-                .orElseThrow(() -> new TrainerNotFoundException("Trainer not found with ID: " + trainerId));
-
-       //update the trainer Entity
-        trainerEntity.setFullName(trainerModel.getFullName());
-        trainerEntity.setProfilePicture(trainerModel.getProfilePicture());
-        trainerEntity.setDesignation(trainerModel.getDesignation());
-        trainerEntity.setJoiningDate(trainerModel.getJoiningDate());
-        trainerEntity.setYearsOfExperience(trainerModel.getYearsOfExperience());
-        trainerEntity.setExpertises(trainerModel.getExpertises());
-        trainerEntity.setContactNumber(trainerModel.getContactNumber());
-        trainerEntity.setPresentAddress(trainerModel.getPresentAddress());
-        trainerRepository.save(trainerEntity);
-        // Return a success message
-        return new ResponseEntity<>("Trainee updated successfully", HttpStatus.OK);
-
     }
 
     @Override
