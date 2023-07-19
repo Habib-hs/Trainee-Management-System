@@ -18,11 +18,6 @@ public class NoticeController {
         return noticeService.createNotice(noticeModel);
     }
 
-    @PostMapping("/create")
-    public ResponseEntity<Object> noticeCreate(@RequestBody NoticeNoFileReqModel noticeModel) {
-        return noticeService.noticeCreate(noticeModel);
-    }
-
     @GetMapping("/{id}")
     public ResponseEntity<Object> getNotice(@PathVariable("id") Long noticeId) {
         return noticeService.getNotice(noticeId);

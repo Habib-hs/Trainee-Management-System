@@ -12,6 +12,6 @@ public interface NoticeService {
      public ResponseEntity<Object> getNotice(Long noticeId);
      public ResponseEntity<Object> updateNotice(Long noticeId, NoticeReqModel noticeModel);
      public ResponseEntity<Object> downloadNoticeFile(Long noticeId);
-     public ResponseEntity<Object> noticeCreate(NoticeNoFileReqModel noticeModel);
+
 
 }

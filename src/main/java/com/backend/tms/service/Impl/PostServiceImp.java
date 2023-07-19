@@ -61,7 +61,7 @@ public class PostServiceImp implements PostService {
                 postEntity.setFileUrl(fileUrl);
             }
             PostEntity createdPost = postRepository.save(postEntity);
-            trainerEntity.getPosts().add(createdPost);
+          //  trainerEntity.getPost().add(createdPost);
 
             return ResponseEntity.status(HttpStatus.CREATED).body("Post created successfully");
         } catch (BatchNotFoundException e) {
@@ -153,7 +153,7 @@ public class PostServiceImp implements PostService {
 
         PostEntity postEntity = modelMapper.map(postModel, PostEntity.class);
         PostEntity createdPost = postRepository.save(postEntity);
-        trainerEntity.getPosts().add(createdPost);
+       // trainerEntity.getPosts().add(createdPost);
         return ResponseEntity.status(HttpStatus.CREATED).body("Post created successfully");
     }
 

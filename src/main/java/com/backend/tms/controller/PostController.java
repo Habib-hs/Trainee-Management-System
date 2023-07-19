@@ -24,7 +24,6 @@ public class PostController {
         return postService.createPostMessage(postModel);
     }
 
-
     @GetMapping("/{id}")
     public ResponseEntity<Object> getPost(@PathVariable("id") Long postId) {
         return postService.getPost(postId);

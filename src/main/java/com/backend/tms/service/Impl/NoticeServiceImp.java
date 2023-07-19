@@ -1,6 +1,7 @@
 package com.backend.tms.service.Impl;
 
 import com.backend.tms.entity.BatchEntity;
+import com.backend.tms.entity.ClassroomEntity;
 import com.backend.tms.entity.NoticeEntity;
 import com.backend.tms.entity.TrainerEntity;
 import com.backend.tms.exception.custom.*;
@@ -8,6 +9,7 @@ import com.backend.tms.model.Classroom.NoticeNoFileReqModel;
 import com.backend.tms.model.Classroom.NoticeReqModel;
 import com.backend.tms.model.Classroom.NoticeResModel;
 import com.backend.tms.repository.BatchRepository;
+import com.backend.tms.repository.ClassroomRepository;
 import com.backend.tms.repository.NoticeRepository;
 import com.backend.tms.repository.TrainerRepository;
 import com.backend.tms.service.NoticeService;
@@ -30,15 +32,17 @@ import java.nio.charset.StandardCharsets;
 public class NoticeServiceImp implements NoticeService {
     private final NoticeRepository noticeRepository;
     private final BatchRepository batchRepository;
-    private final TrainerRepository trainerRepository;
     private final ModelMapper modelMapper;
+    private final TrainerRepository trainerRepository;
+    private final ClassroomRepository classroomRepository;
+
 
     @Override
     public ResponseEntity<Object> createNotice(NoticeReqModel noticeReqModel) {
         try{
-            // Validate if the associated batch exists
-            BatchEntity batchEntity = batchRepository.findById(noticeReqModel.getBatchId())
-                    .orElseThrow(() -> new BatchNotFoundException("Batch not found"));
+            // Validate if the associated classroom exists
+            ClassroomEntity classroomEntity = classroomRepository.findById(noticeReqModel.getClassroomId())
+                    .orElseThrow(() -> new ClassroomNotFoundException("Classroom not found"));
 
             // Validate if the associated trainer exists
             TrainerEntity trainerEntity = trainerRepository.findById(noticeReqModel.getTrainerId())
@@ -55,27 +59,11 @@ public class NoticeServiceImp implements NoticeService {
                 noticeEntity.setFileUrl(fileUrl);
             }
             NoticeEntity createdNotice = noticeRepository.save(noticeEntity);
-            trainerEntity.getNotices().add(createdNotice);
+            classroomEntity.getNotices().add(createdNotice);
             return ResponseEntity.status(HttpStatus.CREATED).body("Notice created successfully");
         }catch(Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to create Notice");
         }
-    }
-
-    @Override
-    public ResponseEntity<Object> noticeCreate(NoticeNoFileReqModel noticeModel) {
-        // Validate if the associated batch exists
-        BatchEntity batchEntity = batchRepository.findById(noticeModel.getBatchId())
-                .orElseThrow(() -> new BatchNotFoundException("Batch not found"));
-
-        // Validate if the associated trainer exists
-        TrainerEntity trainerEntity = trainerRepository.findById(noticeModel.getTrainerId())
-                .orElseThrow(() -> new TrainerNotFoundException("Trainer not found"));
-
-        NoticeEntity noticeEntity = modelMapper.map(noticeModel, NoticeEntity.class);
-        NoticeEntity createdNotice = noticeRepository.save(noticeEntity);
-        trainerEntity.getNotices().add(createdNotice);
-        return ResponseEntity.status(HttpStatus.CREATED).body("Notice created successfully");
     }
 
     @Override
@@ -99,7 +87,7 @@ public class NoticeServiceImp implements NoticeService {
 
             //updating the post Entity
             noticeEntity.setNoticeTitle(noticeModel.getNoticeTitle());
-            noticeEntity.setBatchId(noticeModel.getBatchId());
+            noticeEntity.setClassroomId(noticeModel.getClassroomId());
             noticeEntity.setTrainerId(noticeModel.getTrainerId());
 
             MultipartFile file = noticeModel.getFile();
