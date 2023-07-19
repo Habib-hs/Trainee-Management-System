@@ -44,15 +44,6 @@ public class TrainerEntity {
     @ManyToMany(mappedBy = "trainers")
     private Set<BatchEntity> batches = new HashSet<>();
 
-    //relation with post
-    @Builder.Default
-    @OneToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
-    private Set<PostEntity> posts = new HashSet<>();
-
-    //relationship with notice
-    @Builder.Default
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private Set<NoticeEntity> notices = new HashSet<>();
 
     //hashcode compare
     @Override
