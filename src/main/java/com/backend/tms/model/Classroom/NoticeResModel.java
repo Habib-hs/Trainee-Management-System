@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Date;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -15,7 +17,8 @@ import org.springframework.web.multipart.MultipartFile;
 public class NoticeResModel {
     private Long id;
     private String NoticeTitle;
-    private Long BatchId;
+    private Long classroomId;
     private Long trainerId;
+    private Date createdTime;
     private String file;
 }

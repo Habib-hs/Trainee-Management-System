@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
+
 @Entity
 @Table(name = "notice")
 @Data
@@ -17,7 +19,8 @@ public class NoticeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String NoticeTitle;
-    private Long BatchId;
+    private Long classroomId;
     private Long trainerId;
     private String fileUrl;
+    private Date createdTime;
 }
