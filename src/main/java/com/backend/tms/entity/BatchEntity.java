@@ -25,7 +25,6 @@ public class BatchEntity {
     private String batchName;
     private Timestamp startDate;
     private Timestamp endDate;
-    private int numberOfTrainee;
 
     // Relation with trainee
     @Builder.Default
@@ -42,7 +41,9 @@ public class BatchEntity {
     )
     private Set<TrainerEntity> trainers = new HashSet<>();
 
-
+    // Relation with classroom
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private ClassroomEntity classroom;
 
     @Override
     public boolean equals(Object o) {

@@ -1,10 +1,14 @@
 package com.backend.tms.service.Impl;
 
 import com.backend.tms.entity.BatchEntity;
+import com.backend.tms.entity.ClassroomEntity;
+import com.backend.tms.exception.custom.BatchAlreadyExistsException;
 import com.backend.tms.exception.custom.BatchNotFoundException;
+import com.backend.tms.exception.custom.IllegalArgumentException;
 import com.backend.tms.model.Batch.BatchReqModel;
 import com.backend.tms.model.Batch.BatchResModel;
 import com.backend.tms.repository.BatchRepository;
+import com.backend.tms.repository.ClassroomRepository;
 import com.backend.tms.service.BatchService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -22,20 +26,30 @@ import java.util.Map;
 public class BatchServiceImp implements BatchService {
     private final BatchRepository batchRepository;
     private final ModelMapper modelMapper;
+    private final ClassroomRepository classroomRepository;
     @Override
     public ResponseEntity<Object> createBatch(BatchReqModel batchModel) {
         // Check if a batch with the same name already exists
         String batchName = batchModel.getBatchName();
+        //matching the pattern of the batch name
+        String pattern = "^YSD_B\\d{2}_\\w+$";
+        if (!batchName.matches(pattern)) {
+           throw new IllegalArgumentException("Batch Name is not following the format");
+        }
         BatchEntity existingBatch = batchRepository.findByBatchName(batchName);
         if (existingBatch != null) {
-          // throw new BatchAlreadyExistsException("Batch Already exist with the same name!");
-            return new ResponseEntity<>("Batch already exist", HttpStatus.BAD_REQUEST);
+            throw  new BatchAlreadyExistsException("Batch already exist with the same Name!");
         }
-
         // Create a new BatchEntity
         BatchEntity batchEntity = modelMapper.map(batchModel,BatchEntity.class);
+        // Add classroom for the batch
+        ClassroomEntity classroomEntity = ClassroomEntity.builder()
+                .id(batchEntity.getId())
+                .className(batchEntity.getBatchName())
+                .build();
+        classroomRepository.save(classroomEntity);
+        batchEntity.setClassroom(classroomEntity);;
         batchRepository.save(batchEntity);
-
         // If the save operation is successful, return a success message
         return new ResponseEntity<>("Batch added successfully", HttpStatus.CREATED);
     }

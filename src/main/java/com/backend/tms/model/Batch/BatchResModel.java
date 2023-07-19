@@ -16,5 +16,4 @@ public class BatchResModel {
     private String batchName;
     private Timestamp startDate;
     private Timestamp endDate;
-    private int numberOfTrainee;
 }

@@ -18,5 +18,4 @@ public class BatchReqModel {
     private String batchName;
     private Timestamp startDate;
     private Timestamp endDate;
-    private int numberOfTrainee;
 }
