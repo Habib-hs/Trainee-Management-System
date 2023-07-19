@@ -25,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -38,8 +39,7 @@ public class NoticeServiceImp implements NoticeService {
 
     @Override
     public ResponseEntity<Object> createNotice(NoticeReqModel noticeReqModel) {
-        try{
-           System.out.println("here laso come");
+        try {
             // Validate if the associated classroom exists
             ClassroomEntity classroomEntity = classroomRepository.findById(noticeReqModel.getClassroomId())
                     .orElseThrow(() -> new ClassroomNotFoundException("Classroom not found"));
@@ -49,11 +49,12 @@ public class NoticeServiceImp implements NoticeService {
                     .orElseThrow(() -> new TrainerNotFoundException("Trainer not found"));
 
             MultipartFile file = noticeReqModel.getFile();
-            String fileUrl=null;
+            String fileUrl = null;
 
-            if (!file.isEmpty()) {
-                fileUrl = FileService.uploadFile(file,AppConstants.NOTICE_UPLOAD_DIR);
+            if (file != null && !file.isEmpty()) {
+                fileUrl = FileService.uploadFile(file, AppConstants.NOTICE_UPLOAD_DIR);
             }
+
             NoticeEntity noticeEntity = modelMapper.map(noticeReqModel, NoticeEntity.class);
             Date currentTime = new Date();
             noticeEntity.setCreatedTime(currentTime);
@@ -63,10 +64,12 @@ public class NoticeServiceImp implements NoticeService {
             NoticeEntity createdNotice = noticeRepository.save(noticeEntity);
             classroomEntity.getNotices().add(createdNotice);
             return ResponseEntity.status(HttpStatus.CREATED).body("Notice created successfully");
-        }catch(Exception e) {
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to create Notice");
         }
     }
+
+
 
     @Override
     public ResponseEntity<Object> getNotice(Long noticeId) {

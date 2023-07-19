@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.sql.Date;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -22,7 +22,7 @@ public class PostEntity {
     private Long id;
     private Long trainerId;
     private Long batchId;
-    private String postTitle;
+    private String title;
     private Date createdTime;
     private String fileUrl;
 

@@ -28,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Date;
 
 @Service
 @RequiredArgsConstructor
@@ -44,7 +45,7 @@ public class PostServiceImp implements PostService {
     @Override
     public ResponseEntity<Object> createPost( PostReqModel postModel) {
         try {
-            // Validate if the associated batch exists
+           System.out.println("come inside");
             // Validate if the associated classroom exists
             ClassroomEntity classroomEntity = classroomRepository.findById(postModel.getClassroomId())
                     .orElseThrow(() -> new ClassroomNotFoundException("Classroom not found"));
@@ -63,6 +64,8 @@ public class PostServiceImp implements PostService {
             if (fileUrl != null) {
                 postEntity.setFileUrl(fileUrl);
             }
+            Date currentTime = new Date();
+            postEntity.setCreatedTime(currentTime);
             PostEntity createdPost = postRepository.save(postEntity);
             classroomEntity.getPosts().add(createdPost);
             classroomRepository.save(classroomEntity);
@@ -96,7 +99,7 @@ public class PostServiceImp implements PostService {
                     .orElseThrow(() -> new PostNotFoundException("Post not found with ID: " + postId));
 
             //updating the post Entity
-            postEntity.setPostTitle(postModel.getPostTitle());
+            postEntity.setTitle(postModel.getTitle());
             postEntity.setBatchId(postModel.getClassroomId());
             postEntity.setTrainerId(postModel.getTrainerId());
 

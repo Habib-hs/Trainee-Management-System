@@ -18,6 +18,5 @@ public class NoticeReqModel {
     private String NoticeTitle;
     private Long classroomId;
     private Long trainerId;
-  //  private Date CreatedTime;
     private MultipartFile file;
 }

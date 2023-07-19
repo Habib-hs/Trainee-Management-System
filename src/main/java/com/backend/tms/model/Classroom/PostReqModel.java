@@ -5,7 +5,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.sql.Date;
 
 @Data
 @NoArgsConstructor
@@ -13,9 +12,8 @@ import java.sql.Date;
 @Builder
 public class PostReqModel {
     private Long id;
-    private String postTitle;
+    private String title;
     private Long classroomId;
     private Long trainerId;
-    private Date createdTime;
     private MultipartFile file;
 }

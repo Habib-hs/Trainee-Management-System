@@ -15,7 +15,6 @@ public class NoticeController {
     private final NoticeService noticeService;
     @PostMapping()
     public ResponseEntity<Object> createNotice(@ModelAttribute NoticeReqModel noticeModel) {
-        System.out.println("inside the notice file is come");
         return noticeService.createNotice(noticeModel);
     }
 
