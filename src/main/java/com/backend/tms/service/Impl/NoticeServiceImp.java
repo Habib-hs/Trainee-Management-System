@@ -24,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.util.Date;
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +39,7 @@ public class NoticeServiceImp implements NoticeService {
     @Override
     public ResponseEntity<Object> createNotice(NoticeReqModel noticeReqModel) {
         try{
+           System.out.println("here laso come");
             // Validate if the associated classroom exists
             ClassroomEntity classroomEntity = classroomRepository.findById(noticeReqModel.getClassroomId())
                     .orElseThrow(() -> new ClassroomNotFoundException("Classroom not found"));
@@ -53,6 +55,8 @@ public class NoticeServiceImp implements NoticeService {
                 fileUrl = FileService.uploadFile(file,AppConstants.NOTICE_UPLOAD_DIR);
             }
             NoticeEntity noticeEntity = modelMapper.map(noticeReqModel, NoticeEntity.class);
+            Date currentTime = new Date();
+            noticeEntity.setCreatedTime(currentTime);
             if (fileUrl != null) {
                 noticeEntity.setFileUrl(fileUrl);
             }
