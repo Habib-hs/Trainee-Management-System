@@ -42,6 +42,8 @@ public class BatchEntity {
     )
     private Set<TrainerEntity> trainers = new HashSet<>();
 
+
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
