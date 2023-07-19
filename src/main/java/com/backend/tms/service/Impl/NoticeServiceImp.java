@@ -1,11 +1,9 @@
 package com.backend.tms.service.Impl;
 
-import com.backend.tms.entity.BatchEntity;
 import com.backend.tms.entity.ClassroomEntity;
 import com.backend.tms.entity.NoticeEntity;
 import com.backend.tms.entity.TrainerEntity;
 import com.backend.tms.exception.custom.*;
-import com.backend.tms.model.Classroom.NoticeNoFileReqModel;
 import com.backend.tms.model.Classroom.NoticeReqModel;
 import com.backend.tms.model.Classroom.NoticeResModel;
 import com.backend.tms.repository.BatchRepository;

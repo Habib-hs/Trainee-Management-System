@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Date;
+
 
 @Data
 @NoArgsConstructor
@@ -14,9 +16,9 @@ import org.springframework.web.multipart.MultipartFile;
 public class PostReqModel {
     private Long id;
     private String postTitle;
-    private String postBody;
-    private Long BatchId;
+    private Long classroomId;
     private Long trainerId;
+    private Date createdTime;
     private MultipartFile file;
 
 }

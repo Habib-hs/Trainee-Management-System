@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -22,7 +23,7 @@ public class PostEntity {
     private Long trainerId;
     private Long batchId;
     private String postTitle;
-    private String postBody;
+    private Date createdTime;
     private String fileUrl;
 
     //for the comment relationship

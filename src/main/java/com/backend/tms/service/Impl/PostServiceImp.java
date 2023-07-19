@@ -1,9 +1,12 @@
 package com.backend.tms.service.Impl;
 
 import com.backend.tms.entity.BatchEntity;
+import com.backend.tms.entity.ClassroomEntity;
 import com.backend.tms.entity.PostEntity;
 import com.backend.tms.entity.TrainerEntity;
+import com.backend.tms.exception.custom.ClassroomNotFoundException;
 import com.backend.tms.model.Classroom.PostMessageReqModel;
+import com.backend.tms.repository.ClassroomRepository;
 import org.apache.commons.io.FileUtils;
 import com.backend.tms.exception.custom.BatchNotFoundException;
 import com.backend.tms.exception.custom.PostNotFoundException;
@@ -15,7 +18,6 @@ import com.backend.tms.repository.PostRepository;
 import com.backend.tms.repository.TrainerRepository;
 import com.backend.tms.service.PostService;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.io.FileUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +26,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
@@ -35,6 +36,7 @@ public class PostServiceImp implements PostService {
     private final BatchRepository batchRepository;
     private final TrainerRepository trainerRepository;
     private final ModelMapper modelMapper;
+    private final ClassroomRepository classroomRepository;
 
     private static final String UPLOAD_DIR = "D:\\TMS FILE FOR POSTS";
     private static final String DOWNLOAD_DIR = "D:\\TMS FILE DOWNLOAD FOR POSTS";
@@ -43,8 +45,9 @@ public class PostServiceImp implements PostService {
     public ResponseEntity<Object> createPost( PostReqModel postModel) {
         try {
             // Validate if the associated batch exists
-            BatchEntity batchEntity = batchRepository.findById(postModel.getBatchId())
-                    .orElseThrow(() -> new BatchNotFoundException("Batch not found"));
+            // Validate if the associated classroom exists
+            ClassroomEntity classroomEntity = classroomRepository.findById(postModel.getClassroomId())
+                    .orElseThrow(() -> new ClassroomNotFoundException("Classroom not found"));
 
             // Validate if the associated trainer exists
             TrainerEntity trainerEntity = trainerRepository.findById(postModel.getTrainerId())
@@ -61,13 +64,9 @@ public class PostServiceImp implements PostService {
                 postEntity.setFileUrl(fileUrl);
             }
             PostEntity createdPost = postRepository.save(postEntity);
-          //  trainerEntity.getPost().add(createdPost);
-
+            classroomEntity.getPosts().add(createdPost);
+            classroomRepository.save(classroomEntity);
             return ResponseEntity.status(HttpStatus.CREATED).body("Post created successfully");
-        } catch (BatchNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (TrainerNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to create post");
         }
@@ -98,8 +97,7 @@ public class PostServiceImp implements PostService {
 
             //updating the post Entity
             postEntity.setPostTitle(postModel.getPostTitle());
-            postEntity.setPostBody(postModel.getPostBody());
-            postEntity.setBatchId(postModel.getBatchId());
+            postEntity.setBatchId(postModel.getClassroomId());
             postEntity.setTrainerId(postModel.getTrainerId());
 
             MultipartFile file = postModel.getFile();
