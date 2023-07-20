@@ -58,6 +58,20 @@ public class TraineeServiceImp implements TraineeService {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @Override
+    public ResponseEntity<Object> getBatchByTraineeId(Long traineeId) {
+        List<BatchEntity> batches = batchRepository.findAll();
+        for (BatchEntity batch : batches) {
+            for (TraineeEntity trainee : batch.getTrainees()) {
+                if (trainee.getId().equals(traineeId)) {
+                    return ResponseEntity.ok(batch.getId());
+                }
+            }
+        }
+        // If no match is found,
+        return ResponseEntity.notFound().build();
+    }
+
 
 
     @Override

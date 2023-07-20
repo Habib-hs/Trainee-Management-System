@@ -29,7 +29,10 @@ public class TraineeController {
         return traineeService.getTraineeById(traineeId);
     }
 
-
+    @GetMapping("/classroom/{id}")
+    public ResponseEntity<Object> getBatchByTraineeId(@PathVariable("id") Long traineeId) {
+        return traineeService. getBatchByTraineeId(traineeId);
+    }
 
     @PutMapping("/update/{id}")
     public ResponseEntity<Object> updateTrainee(
