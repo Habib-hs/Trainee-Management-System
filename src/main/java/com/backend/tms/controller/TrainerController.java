@@ -30,6 +30,12 @@ public class TrainerController {
         return trainerService.getTrainerIdAndName();
     };
 
+    @GetMapping("/classroom/{id}")
+    public ResponseEntity<Object> getBatchByTrainerId(@PathVariable("id") Long trainerId) {
+        return trainerService. getBatchByTrainerId(trainerId);
+    }
+
+
     @GetMapping("/{id}")
     public ResponseEntity<Object> getTrainerById(@PathVariable("id") Long trainerId) {
         return trainerService.getTrainerById(trainerId);

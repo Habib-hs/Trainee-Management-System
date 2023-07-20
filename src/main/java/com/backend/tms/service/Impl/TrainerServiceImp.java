@@ -1,5 +1,6 @@
 package com.backend.tms.service.Impl;
 
+import com.backend.tms.entity.BatchEntity;
 import com.backend.tms.entity.TraineeEntity;
 import com.backend.tms.entity.TrainerEntity;
 import com.backend.tms.exception.custom.TrainerNotFoundException;
@@ -94,6 +95,17 @@ public class TrainerServiceImp implements TrainerService {
         response.put("Trainers", trainers);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<Object> getBatchByTrainerId(Long trainerId) {
+        TrainerEntity trainer = trainerRepository.findById(trainerId).orElse(null);
+        if (trainer == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Trainer not found");
+        }
+        Set<BatchEntity> batches = trainer.getBatches(); // Assuming there's a getter for the batches in TrainerEntity
+        List<Long> batchIds = batches.stream().map(BatchEntity::getId).collect(Collectors.toList());
+        return ResponseEntity.ok(batchIds);
     }
 
     @Override

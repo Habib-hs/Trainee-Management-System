@@ -114,4 +114,5 @@ public class TraineeServiceImp implements TraineeService {
         traineeRepository.deleteById(traineeId);
         return new ResponseEntity<>("Trainee deleted successfully", HttpStatus.OK);
     }
+
 }
