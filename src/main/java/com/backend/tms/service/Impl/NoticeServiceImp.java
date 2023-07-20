@@ -91,7 +91,7 @@ public class NoticeServiceImp implements NoticeService {
                     .orElseThrow(() -> new NoticeNotFoundException("Notice not found with ID: " + noticeId));
 
             //updating the post Entity
-            noticeEntity.setNoticeTitle(noticeModel.getNoticeTitle());
+            noticeEntity.setNoticeTitle(noticeModel.getTitle());
             noticeEntity.setClassroomId(noticeModel.getClassroomId());
             noticeEntity.setTrainerId(noticeModel.getTrainerId());
 

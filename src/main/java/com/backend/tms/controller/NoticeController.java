@@ -23,11 +23,6 @@ public class NoticeController {
         return noticeService.getNotice(noticeId);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Object> getAllNoticeByClassname(@PathVariable("id") Long noticeId) {
-        return noticeService.getNotice(noticeId);
-    }
-
     @PutMapping("/update/{id}")
     public ResponseEntity<Object> updateNotice(@PathVariable("id") Long noticeId, @ModelAttribute NoticeReqModel noticeModel) {
         return noticeService.updateNotice(noticeId, noticeModel);

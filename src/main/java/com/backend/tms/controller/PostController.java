@@ -29,10 +29,6 @@ public class PostController {
         return postService.getPost(postId);
     }
 
-    @GetMapping()
-    public ResponseEntity<Object> getAllPostsByClassroom() {
-        return postService.getAllPostsByClassroom();
-    }
 
     @PutMapping("update/{id}")
     public ResponseEntity<Object> updatePost(@PathVariable("id") Long postId, @ModelAttribute PostReqModel postModel) {

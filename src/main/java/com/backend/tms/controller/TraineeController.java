@@ -29,6 +29,8 @@ public class TraineeController {
         return traineeService.getTraineeById(traineeId);
     }
 
+
+
     @PutMapping("/update/{id}")
     public ResponseEntity<Object> updateTrainee(
             @PathVariable("id") Long traineeId,

@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class AuthenticationResModel {
+    private Long roleBasedId;
     private String message;
     private String token;
 }

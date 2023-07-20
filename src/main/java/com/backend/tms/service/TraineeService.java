@@ -9,7 +9,6 @@ import java.util.List;
 public interface TraineeService {
     ResponseEntity<Object> getAllTrainees();
     ResponseEntity<Object> getAllTrainee();
-
     ResponseEntity<Object> getTraineeById(Long traineeId);
     ResponseEntity<Object> updateTrainee(Long traineeId, TraineeUpdateReqModel traineeModel);
     ResponseEntity<Object> deleteTrainee(Long traineeId);

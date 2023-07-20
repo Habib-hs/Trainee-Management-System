@@ -76,7 +76,7 @@ public class AuthServiceImp implements AuthService {
         }
         // Create a new UserEntity
         UserEntity userTrainee = UserEntity.builder()
-                .id(traineeModel.getId()) // Set the ID explicitly
+                .id(traineeModel.getId())
                 .email(traineeModel.getEmail())
                 .password(passwordEncoder.encode(traineeModel.getPassword()))
                 .role("Trainee")
@@ -89,6 +89,9 @@ public class AuthServiceImp implements AuthService {
         TraineeEntity trainee = modelMapper.map(traineeModel, TraineeEntity.class);
         trainee.setUser(newUser);
         traineeRepository.save(trainee);
+        //add trainee Id on the User table
+        newUser.setRoleBasedId(trainee.getId());
+        userRepository.save(newUser);
         return new ResponseEntity<>("Trainee Created Successfully", HttpStatus.OK);
     }
 
@@ -115,6 +118,9 @@ public class AuthServiceImp implements AuthService {
         TrainerEntity trainer = modelMapper.map(trainerModel, TrainerEntity.class);
         trainer.setUser(newUser);
         trainerRepository.save(trainer);
+        //add the trainerId
+        newUser.setRoleBasedId(trainer.getId());
+        userRepository.save(newUser);
         return new ResponseEntity<>("trainer created successfully", HttpStatus.OK);
 
     }
@@ -131,6 +137,7 @@ public class AuthServiceImp implements AuthService {
         var jwtToken = jwtService.generateToken(user);
         AuthenticationResModel authenticationResponse = AuthenticationResModel.builder()
                 .message("Successfully Login!")
+                .roleBasedId(user.getRoleBasedId())
                 .token(jwtToken)
                 .build();
         return ResponseEntity.ok(authenticationResponse);
