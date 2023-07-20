@@ -29,7 +29,6 @@ public class PostController {
         return postService.getPost(postId);
     }
 
-
     @PutMapping("update/{id}")
     public ResponseEntity<Object> updatePost(@PathVariable("id") Long postId, @ModelAttribute PostReqModel postModel) {
         return postService.updatePost(postId, postModel);
@@ -39,6 +38,10 @@ public class PostController {
         return postService.downloadPostFile(postId);
     }
 
+    @GetMapping("/classroom/{id}")
+    public ResponseEntity<Object> getAllPostsByClassroom(@PathVariable("id") Long classroomId) {
+        return postService.getAllPostsByClassroom(classroomId);
+    }
 
 
 }

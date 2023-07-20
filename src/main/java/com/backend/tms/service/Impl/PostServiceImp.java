@@ -155,10 +155,10 @@ public class PostServiceImp implements PostService {
         return ResponseEntity.status(HttpStatus.CREATED).body("Post created successfully");
     }
 
-    /*
+
     @Override
-    public ResponseEntity<Object> getAllPostsByClassroom() {
-        List<PostEntity> postEntityList = postRepository.findAll();
+    public ResponseEntity<Object> getAllPostsByClassroom(Long classroomId) {
+        List<PostEntity> postEntityList = postRepository.findByClassroomId(classroomId);
 
         Map<String, Object> response = new HashMap<>();
         response.put("Total Post", postEntityList.size());
@@ -189,7 +189,7 @@ public class PostServiceImp implements PostService {
         response.put("Posts", postsWithTrainerName);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
-*/
+
 
     private String uploadFile(MultipartFile file) {
         if (file != null && !file.isEmpty()) {
