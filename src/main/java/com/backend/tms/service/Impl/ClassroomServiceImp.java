@@ -36,4 +36,14 @@ public class ClassroomServiceImp implements ClassroomService {
         response.put("Classroom", classrooms);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @Override
+    public ResponseEntity<Object> getClassroomByName(String classroomName) {
+        ClassroomEntity classroom = classroomRepository.findByClassName(classroomName);
+        if (classroom != null) {
+            return new ResponseEntity<>(classroom.getId(), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("Classroom not found", HttpStatus.NOT_FOUND);
+        }
+    }
 }

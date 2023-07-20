@@ -2,6 +2,7 @@ package com.backend.tms.service.Impl;
 
 import com.backend.tms.entity.ClassroomEntity;
 import com.backend.tms.entity.NoticeEntity;
+import com.backend.tms.entity.PostEntity;
 import com.backend.tms.entity.TrainerEntity;
 import com.backend.tms.exception.custom.*;
 import com.backend.tms.model.Classroom.NoticeReqModel;
@@ -24,8 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
-import java.util.Date;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -91,7 +91,7 @@ public class NoticeServiceImp implements NoticeService {
                     .orElseThrow(() -> new NoticeNotFoundException("Notice not found with ID: " + noticeId));
 
             //updating the post Entity
-            noticeEntity.setNoticeTitle(noticeModel.getTitle());
+            noticeEntity.setTitle(noticeModel.getTitle());
             noticeEntity.setClassroomId(noticeModel.getClassroomId());
             noticeEntity.setTrainerId(noticeModel.getTrainerId());
 
@@ -132,6 +132,38 @@ public class NoticeServiceImp implements NoticeService {
         }catch(Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to read or save the file");
         }
+    }
+
+    @Override
+    public ResponseEntity<Object> getAllNoticeByClassroomId(Long classroomId) {
+        List<NoticeEntity> noticeEntityList = noticeRepository.findByClassroomId(classroomId);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("Total Notice", noticeEntityList.size());
+
+        List<Map<String, Object>> notices = new ArrayList<>();
+        for (NoticeEntity noticeEntity : noticeEntityList) {
+            Map<String, Object> notice = new HashMap<>();
+            notice.put("id", noticeEntity.getId());
+            notice.put("trainerId", noticeEntity.getTrainerId());
+            notice.put("classroomId", noticeEntity.getClassroomId());
+            notice.put("title", noticeEntity.getTitle());
+            notice.put("createdTime", noticeEntity.getCreatedTime());
+            notice.put("fileUrl", noticeEntity.getFileUrl());
+
+            // Fetch the trainer's name using trainerRepository.findById(trainerId)
+            Optional<TrainerEntity> trainerOptional = trainerRepository.findById(noticeEntity.getTrainerId());
+            if (trainerOptional.isPresent()) {
+                TrainerEntity trainerEntity = trainerOptional.get();
+                notice.put("trainerName", trainerEntity.getFullName());
+            } else {
+                notice.put("trainerName", "Trainer not found"); // Or any other default value
+            }
+            notices.add(notice);
+        }
+
+        response.put("Posts", notices);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 }

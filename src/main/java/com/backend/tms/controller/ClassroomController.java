@@ -4,6 +4,7 @@ import com.backend.tms.service.ClassroomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -15,5 +16,11 @@ public class ClassroomController {
     @GetMapping("/get")
     public ResponseEntity<Object> getAllClassroom() {
         return classroomService.getAllClassroomName();
+    }
+
+
+    @GetMapping("/{classroomName}")
+    public ResponseEntity<Object> getClassroomByName(@PathVariable("classroomName") String classroomName) {
+        return classroomService.getClassroomByName(classroomName);
     }
 }

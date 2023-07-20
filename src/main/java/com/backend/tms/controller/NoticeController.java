@@ -32,4 +32,10 @@ public class NoticeController {
         return noticeService.downloadNoticeFile(noticeId);
     }
 
+    @GetMapping("/classroom/{id}")
+    public ResponseEntity<Object> getAllNoticeByClassroomId(@PathVariable("id") Long classroomId) {
+        return noticeService.getAllNoticeByClassroomId(classroomId);
+    }
+
+
 }
