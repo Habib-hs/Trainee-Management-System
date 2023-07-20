@@ -21,7 +21,7 @@ public class PostEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Long trainerId;
-    private Long batchId;
+    private Long classroomId;
     private String title;
     private Date createdTime;
     private String fileUrl;

@@ -28,7 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Date;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -45,7 +45,6 @@ public class PostServiceImp implements PostService {
     @Override
     public ResponseEntity<Object> createPost( PostReqModel postModel) {
         try {
-           System.out.println("come inside");
             // Validate if the associated classroom exists
             ClassroomEntity classroomEntity = classroomRepository.findById(postModel.getClassroomId())
                     .orElseThrow(() -> new ClassroomNotFoundException("Classroom not found"));
@@ -75,7 +74,6 @@ public class PostServiceImp implements PostService {
         }
     }
 
-
     @Override
     public ResponseEntity<Object> getPost(Long postId) {
         try {
@@ -100,7 +98,7 @@ public class PostServiceImp implements PostService {
 
             //updating the post Entity
             postEntity.setTitle(postModel.getTitle());
-            postEntity.setBatchId(postModel.getClassroomId());
+            postEntity.setClassroomId(postModel.getClassroomId());
             postEntity.setTrainerId(postModel.getTrainerId());
 
             MultipartFile file = postModel.getFile();
@@ -126,7 +124,6 @@ public class PostServiceImp implements PostService {
        try{
            File file = new File(postEntity.getFileUrl());
            String fileContents = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
-
            // Create a new file in the specified directory
            String fileName = StringUtils.cleanPath(file.getName());
            File destinationDir = new File(DOWNLOAD_DIR);
@@ -157,6 +154,41 @@ public class PostServiceImp implements PostService {
        // trainerEntity.getPosts().add(createdPost);
         return ResponseEntity.status(HttpStatus.CREATED).body("Post created successfully");
     }
+
+    @Override
+    public ResponseEntity<Object> getAllPostsByClassroom() {
+        List<PostEntity> postEntityList = postRepository.findAll();
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("Total Post", postEntityList.size());
+
+        List<Map<String, Object>> postsWithTrainerName = new ArrayList<>();
+        for (PostEntity postEntity : postEntityList) {
+            Map<String, Object> postWithTrainerName = new HashMap<>();
+            postWithTrainerName.put("id", postEntity.getId());
+            postWithTrainerName.put("trainerId", postEntity.getTrainerId());
+            postWithTrainerName.put("classroomId", postEntity.getClassroomId());
+            postWithTrainerName.put("title", postEntity.getTitle());
+            postWithTrainerName.put("createdTime", postEntity.getCreatedTime());
+            postWithTrainerName.put("fileUrl", postEntity.getFileUrl());
+           // postWithTrainerName.put("comments", postEntity.getComments());
+
+            // Fetch the trainer's name using trainerRepository.findById(trainerId)
+            Optional<TrainerEntity> trainerOptional = trainerRepository.findById(postEntity.getTrainerId());
+            if (trainerOptional.isPresent()) {
+                TrainerEntity trainerEntity = trainerOptional.get();
+                postWithTrainerName.put("trainerName", trainerEntity.getFullName());
+            } else {
+                postWithTrainerName.put("trainerName", "Trainer not found"); // Or any other default value
+            }
+
+            postsWithTrainerName.add(postWithTrainerName);
+        }
+
+        response.put("Posts", postsWithTrainerName);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
 
     private String uploadFile(MultipartFile file) {
         if (file != null && !file.isEmpty()) {

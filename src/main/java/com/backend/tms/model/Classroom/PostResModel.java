@@ -14,7 +14,7 @@ import java.sql.Date;
 @Builder
 public class PostResModel {
     private Long id;
-    private String postTitle;
+    private String title;
     private Date createdTime;
     private Long classroomId;
     private Long trainerId;
