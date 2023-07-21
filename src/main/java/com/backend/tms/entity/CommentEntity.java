@@ -19,6 +19,7 @@ public class CommentEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String comment;
+    private String traineeName;
     private Long postId;
     private Timestamp time;
 }

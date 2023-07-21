@@ -17,5 +17,6 @@ public class CommentReqModel {
     private Long id;
     private String comment;
     private Long postId;
-    private Timestamp time;
+    private Long traineeId;
+    private Date time;
 }

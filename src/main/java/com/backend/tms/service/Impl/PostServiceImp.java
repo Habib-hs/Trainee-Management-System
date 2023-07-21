@@ -159,7 +159,6 @@ public class PostServiceImp implements PostService {
     @Override
     public ResponseEntity<Object> getAllPostsByClassroom(Long classroomId) {
         List<PostEntity> postEntityList = postRepository.findByClassroomId(classroomId);
-
         Map<String, Object> response = new HashMap<>();
         response.put("Total Post", postEntityList.size());
 
@@ -172,7 +171,7 @@ public class PostServiceImp implements PostService {
             postWithTrainerName.put("title", postEntity.getTitle());
             postWithTrainerName.put("createdTime", postEntity.getCreatedTime());
             postWithTrainerName.put("fileUrl", postEntity.getFileUrl());
-           // postWithTrainerName.put("comments", postEntity.getComments());
+            postWithTrainerName.put("comments", postEntity.getComments());
 
             // Fetch the trainer's name using trainerRepository.findById(trainerId)
             Optional<TrainerEntity> trainerOptional = trainerRepository.findById(postEntity.getTrainerId());

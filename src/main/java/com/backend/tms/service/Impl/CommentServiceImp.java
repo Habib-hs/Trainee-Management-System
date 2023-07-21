@@ -3,11 +3,13 @@ package com.backend.tms.service.Impl;
 
 import com.backend.tms.entity.CommentEntity;
 import com.backend.tms.entity.PostEntity;
+import com.backend.tms.entity.TraineeEntity;
 import com.backend.tms.exception.custom.CommentNotFoundException;
 import com.backend.tms.exception.custom.PostNotFoundException;
 import com.backend.tms.model.Classroom.CommentReqModel;
 import com.backend.tms.repository.CommentRepository;
 import com.backend.tms.repository.PostRepository;
+import com.backend.tms.repository.TraineeRepository;
 import com.backend.tms.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -16,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +26,7 @@ public class CommentServiceImp implements CommentService {
 
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
+    private final TraineeRepository traineeRepository;
     private final ModelMapper modelMapper;
 
     @Override
@@ -38,6 +42,12 @@ public class CommentServiceImp implements CommentService {
 
             // Create comment entity and save it
             CommentEntity commentEntity = modelMapper.map(commentModel, CommentEntity.class);
+            //adding trainee name
+            Optional<TraineeEntity> traineeEntity = traineeRepository.findById(commentModel.getTraineeId());
+            if (traineeEntity.isPresent()) {
+                TraineeEntity trainee = traineeEntity.get();
+                commentEntity.setTraineeName(trainee.getFullName());
+            }
             commentEntity.setPostId(postId);
             CommentEntity createdComment = commentRepository.save(commentEntity);
 
