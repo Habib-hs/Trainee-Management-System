@@ -3,6 +3,8 @@ import java.io.File;
 import java.nio.charset.StandardCharsets;
 
 import com.backend.tms.entity.AssignmentEntity;
+import com.backend.tms.entity.BatchEntity;
+import com.backend.tms.entity.PostEntity;
 import com.backend.tms.entity.ScheduleBatchEntity;
 import com.backend.tms.exception.custom.AssignmentNotFoundException;
 import com.backend.tms.exception.custom.ScheduleNotFoundException;
@@ -22,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -37,22 +40,17 @@ public class AssignmentServiceImp implements AssignmentService {
     public ResponseEntity<Object> createAssignment(AssignmentReqModel assignmentModel) {
         try {
             MultipartFile file = assignmentModel.getFile();
-            if (file.isEmpty()) {
-                return ResponseEntity.badRequest().body("No file selected.");
+            String fileUrl = null;
+            if (file != null && !file.isEmpty()) {
+                fileUrl = uploadFile(file);
             }
-
-            String fileUrl = uploadFile(file);
-            if (fileUrl == null) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload the file");
-            }
-
             AssignmentEntity assignmentEntity = modelMapper.map(assignmentModel, AssignmentEntity.class);
-            assignmentEntity.setFileUrl(fileUrl);
-
+            if (fileUrl != null) {
+                assignmentEntity.setFileUrl(fileUrl);
+            }
             ScheduleBatchEntity scheduleBatchEntity = scheduleRepository
                     .findById(assignmentModel.getScheduleId())
                     .orElseThrow(() -> new ScheduleNotFoundException("Schedule not found"));
-
             scheduleBatchEntity.getAssignments().add(assignmentEntity);
             scheduleRepository.save(scheduleBatchEntity);
 
@@ -151,6 +149,14 @@ public class AssignmentServiceImp implements AssignmentService {
             ScheduleBatchEntity scheduleEntity = scheduleRepository.findById(assignmentEntity.getScheduleId())
                     .orElseThrow(() -> new ScheduleNotFoundException("Schedule not found for assignment with ID: " + assignmentEntity.getId()));
             assignmentMap.put("scheduleName", scheduleEntity.getCourseName());
+
+            // fetch the batches that is related to schedule
+            Set<BatchEntity>  batchEntities= scheduleEntity.getBatches();
+                    List<Long> batchIds = batchEntities.stream()
+                    .map(BatchEntity::getId)
+                    .collect(Collectors.toList());
+            assignmentMap.put("batches" , batchIds) ;
+
             assignmentList.add(assignmentMap);
         }
 

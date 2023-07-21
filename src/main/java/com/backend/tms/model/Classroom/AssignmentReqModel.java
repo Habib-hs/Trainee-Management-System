@@ -20,6 +20,5 @@ public class AssignmentReqModel {
     private String type;
     private Date deadline;
     private MultipartFile file;
-
     // Constructors, getters, and setters can be added here
 }
