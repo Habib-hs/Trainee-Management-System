@@ -35,4 +35,10 @@ public class AssignmentController {
          return assignmentService.downloadAssignmentFile(assignmentId);
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<Object> getAllAssignmentsWithoutSubmittedList() {
+     return assignmentService.getAllAssignmentsWithoutSubmittedList();
+
+    }
+
 }

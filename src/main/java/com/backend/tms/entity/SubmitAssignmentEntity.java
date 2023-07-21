@@ -23,5 +23,5 @@ public class SubmitAssignmentEntity {
     private Long assignmentId;
     private Long traineeId;
     private String submitFileUrl;
-    private Date time;
+    private Date createdTime;
 }

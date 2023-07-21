@@ -21,6 +21,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.*;
 
 
 @Service
@@ -128,6 +129,36 @@ public class AssignmentServiceImp implements AssignmentService {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to read or save the file");
         }
+    }
+
+    @Override
+    public ResponseEntity<Object> getAllAssignmentsWithoutSubmittedList() {
+        List<AssignmentEntity> assignments = assignmentRepository.findAll();
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("Total Assignment", assignments.size());
+
+        List<Map<String, Object>> assignmentList = new ArrayList<>();
+        for (AssignmentEntity assignmentEntity : assignments) {
+            Map<String, Object> assignmentMap = new HashMap<>();
+            assignmentMap.put("id", assignmentEntity.getId());
+            assignmentMap.put("name", assignmentEntity.getName());
+            assignmentMap.put("type", assignmentEntity.getType());
+            assignmentMap.put("deadline", assignmentEntity.getDeadline());
+            assignmentMap.put("fileUrl", assignmentEntity.getFileUrl());
+
+            // Fetch the scheduleEntity from the scheduleRepository using the scheduleId
+            ScheduleBatchEntity scheduleEntity = scheduleRepository.findById(assignmentEntity.getScheduleId())
+                    .orElseThrow(() -> new ScheduleNotFoundException("Schedule not found for assignment with ID: " + assignmentEntity.getId()));
+            assignmentMap.put("scheduleName", scheduleEntity.getCourseName());
+            assignmentList.add(assignmentMap);
+        }
+
+        response.put("Assignments", assignmentList);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+
+
     }
 
     private void updateAssignmentAttributes(AssignmentEntity assignmentEntity, AssignmentReqModel assignmentModel) {

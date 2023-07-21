@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
 import java.util.Optional;
 
 
@@ -47,6 +48,8 @@ public class SubmitAssignmentServiceImp implements SubmitAssignmentService {
             //saved the submitted assignment
             SubmitAssignmentEntity subAssignmentEntity = modelMapper.map(submitAssignmentModel, SubmitAssignmentEntity.class);
             subAssignmentEntity.setSubmitFileUrl(fileUrl);
+            Date currentTime = new Date();
+            subAssignmentEntity.setCreatedTime(currentTime);
             submitAssignmentRepository.save(subAssignmentEntity);
 
             // Update the assignment with the submission details
@@ -85,7 +88,6 @@ public class SubmitAssignmentServiceImp implements SubmitAssignmentService {
                 subAssignmentEntity.setAssignmentId(subAssignmentEntity.getAssignmentId());
                 subAssignmentEntity.setTraineeId(subAssignmentEntity.getTraineeId());
                 subAssignmentEntity.setSubmitFileUrl(fileUrl);
-                subAssignmentEntity.setTime(submitAssignmentModel.getTime());
                 submitAssignmentRepository.save(subAssignmentEntity);
                 // Return a success response
                 return ResponseEntity.ok("Assignment updated successfully");

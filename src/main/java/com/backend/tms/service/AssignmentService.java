@@ -11,5 +11,6 @@ public interface AssignmentService {
      ResponseEntity<Object> updateAssignment(Long assignmentId, AssignmentReqModel assignmentModel);
 
     ResponseEntity<Object> downloadAssignmentFile(Long assignmentId);
+    public ResponseEntity<Object> getAllAssignmentsWithoutSubmittedList();
 
 }

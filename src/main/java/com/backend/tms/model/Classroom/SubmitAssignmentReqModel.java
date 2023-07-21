@@ -17,6 +17,5 @@ public class SubmitAssignmentReqModel {
     private Long id;
     private Long assignmentId;
     private Long traineeId;
-    private Date time;
     private MultipartFile file;
 }
