@@ -2,16 +2,15 @@ package com.backend.tms.service.Impl;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 
-import com.backend.tms.entity.AssignmentEntity;
-import com.backend.tms.entity.BatchEntity;
-import com.backend.tms.entity.PostEntity;
-import com.backend.tms.entity.ScheduleBatchEntity;
+import com.backend.tms.entity.*;
 import com.backend.tms.exception.custom.AssignmentNotFoundException;
 import com.backend.tms.exception.custom.ScheduleNotFoundException;
+import com.backend.tms.exception.custom.TrainerNotFoundException;
 import com.backend.tms.model.Classroom.AssignmentReqModel;
 import com.backend.tms.model.Classroom.AssignmentResModel;
 import com.backend.tms.repository.AssignmentRepository;
 import com.backend.tms.repository.ScheduleRepository;
+import com.backend.tms.repository.TrainerRepository;
 import com.backend.tms.service.AssignmentService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FileUtils;
@@ -33,6 +32,7 @@ public class AssignmentServiceImp implements AssignmentService {
 
     private final AssignmentRepository assignmentRepository;
     private final ScheduleRepository scheduleRepository;
+    private final TrainerRepository trainerRepository;
     private final ModelMapper modelMapper;
     private static final String UPLOAD_DIR = "D:\\TMS FILE";
     private static final String DOWNLOAD_DIR = "D:\\TMS FILE DOWNLOAD";
@@ -77,7 +77,6 @@ public class AssignmentServiceImp implements AssignmentService {
                 }
                 assignmentEntity.setFileUrl(fileUrl);
             }
-
             assignmentRepository.save(assignmentEntity);
 
             return ResponseEntity.status(HttpStatus.OK).body("Assignment updated successfully");
@@ -159,7 +158,6 @@ public class AssignmentServiceImp implements AssignmentService {
 
             assignmentList.add(assignmentMap);
         }
-
         response.put("Assignments", assignmentList);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
@@ -167,7 +165,39 @@ public class AssignmentServiceImp implements AssignmentService {
 
     }
 
+    @Override
+    public ResponseEntity<Object> getAssignmentListByTrainer(Long trainerId) {
+        TrainerEntity trainerEntity = trainerRepository.findById(trainerId).orElseThrow(()->new TrainerNotFoundException("trainer not found!"));
+        List<AssignmentEntity> assignments = assignmentRepository.findByTrainerId(trainerId);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("Total Assignment", assignments.size());
+        List<Map<String, Object>> assignmentList = new ArrayList<>();
+        for (AssignmentEntity assignmentEntity : assignments) {
+            Map<String, Object> assignmentMap = new HashMap<>();
+            assignmentMap.put("id", assignmentEntity.getId());
+            assignmentMap.put("name", assignmentEntity.getName());
+            assignmentMap.put("type", assignmentEntity.getType());
+            assignmentMap.put("deadline", assignmentEntity.getDeadline());
+            assignmentMap.put("fileUrl", assignmentEntity.getFileUrl());
+            // Fetch the scheduleEntity from the scheduleRepository using the scheduleId
+            ScheduleBatchEntity scheduleEntity = scheduleRepository.findById(assignmentEntity.getScheduleId())
+                    .orElseThrow(() -> new ScheduleNotFoundException("Schedule not found for assignment with ID: " + assignmentEntity.getId()));
+            assignmentMap.put("scheduleName", scheduleEntity.getCourseName());
+
+            //fetch the total submitted assignment
+             assignmentMap.put("totalSubmitted", assignmentEntity.getSubAssignments().size());
+             assignmentMap.put("submittedAssignment", assignmentEntity.getSubAssignments());
+            assignmentList.add(assignmentMap);
+            }
+        response.put("Assignments", assignmentList);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+
     private void updateAssignmentAttributes(AssignmentEntity assignmentEntity, AssignmentReqModel assignmentModel) {
+       assignmentEntity.setScheduleId(assignmentModel.getScheduleId());
         assignmentEntity.setName(assignmentModel.getName());
         assignmentEntity.setType(assignmentModel.getType());
         assignmentEntity.setDeadline(assignmentModel.getDeadline());

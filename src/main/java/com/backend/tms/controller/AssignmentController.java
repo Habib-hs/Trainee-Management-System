@@ -38,7 +38,11 @@ public class AssignmentController {
     @GetMapping("/all")
     public ResponseEntity<Object> getAllAssignmentsWithoutSubmittedList() {
      return assignmentService.getAllAssignmentsWithoutSubmittedList();
+    }
 
+    @GetMapping("/trainer/{trainerId}")
+    public ResponseEntity<Object> getAssignmentListByTrainer(@PathVariable("trainerId") Long trainerId) {
+        return assignmentService.getAssignmentListByTrainer(trainerId);
     }
 
 }

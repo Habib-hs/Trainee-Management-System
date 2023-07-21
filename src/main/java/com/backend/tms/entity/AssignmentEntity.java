@@ -22,6 +22,7 @@ public class AssignmentEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Long scheduleId;
+    private Long trainerId;
     private String name;
     private String type;
     private Date deadline;

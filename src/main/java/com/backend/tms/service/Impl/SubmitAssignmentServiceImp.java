@@ -2,10 +2,12 @@ package com.backend.tms.service.Impl;
 
 import com.backend.tms.entity.AssignmentEntity;
 import com.backend.tms.entity.SubmitAssignmentEntity;
+import com.backend.tms.entity.TraineeEntity;
 import com.backend.tms.exception.custom.AssignmentNotFoundException;
 import com.backend.tms.model.Classroom.SubmitAssignmentReqModel;
 import com.backend.tms.repository.AssignmentRepository;
 import com.backend.tms.repository.SubmitAssignmentRepository;
+import com.backend.tms.repository.TraineeRepository;
 import com.backend.tms.service.SubmitAssignmentService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -27,6 +29,7 @@ public class SubmitAssignmentServiceImp implements SubmitAssignmentService {
 
     private final SubmitAssignmentRepository submitAssignmentRepository;
     private final AssignmentRepository assignmentRepository;
+    private final TraineeRepository traineeRepository;
     private final ModelMapper modelMapper;
 
     private static final String UPLOAD_DIR = "D:\\TMS FILE";
@@ -45,11 +48,16 @@ public class SubmitAssignmentServiceImp implements SubmitAssignmentService {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload the file");
             }
 
+            //getting the traineeName
+            Optional<TraineeEntity> traineeEntity = traineeRepository.findById(submitAssignmentModel.getTraineeId());
+             TraineeEntity trainee = traineeEntity.get();
+
             //saved the submitted assignment
             SubmitAssignmentEntity subAssignmentEntity = modelMapper.map(submitAssignmentModel, SubmitAssignmentEntity.class);
             subAssignmentEntity.setSubmitFileUrl(fileUrl);
             Date currentTime = new Date();
             subAssignmentEntity.setCreatedTime(currentTime);
+            subAssignmentEntity.setTraineeName(trainee.getFullName());
             submitAssignmentRepository.save(subAssignmentEntity);
 
             // Update the assignment with the submission details
@@ -81,6 +89,7 @@ public class SubmitAssignmentServiceImp implements SubmitAssignmentService {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload the file");
             }
 
+
             // Retrieve the existing submitted assignment
             Optional<SubmitAssignmentEntity> submittedAssignment = submitAssignmentRepository.findById(subAssignmentId);
             if (submittedAssignment.isPresent()) {
@@ -89,7 +98,6 @@ public class SubmitAssignmentServiceImp implements SubmitAssignmentService {
                 subAssignmentEntity.setTraineeId(subAssignmentEntity.getTraineeId());
                 subAssignmentEntity.setSubmitFileUrl(fileUrl);
                 submitAssignmentRepository.save(subAssignmentEntity);
-                // Return a success response
                 return ResponseEntity.ok("Assignment updated successfully");
             }else {
                 throw new AssignmentNotFoundException("Assignment not found with ID: " + subAssignmentId);
