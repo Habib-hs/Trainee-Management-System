@@ -24,6 +24,7 @@ public class AssignmentEntity {
     private Long scheduleId;
     private Long trainerId;
     private String name;
+    private String description;
     private String type;
     private Date deadline;
     private String fileUrl;

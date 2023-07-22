@@ -1,5 +1,6 @@
 package com.backend.tms.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -55,11 +56,13 @@ public class ScheduleBatchEntity {
             joinColumns = @JoinColumn(name = "programSchedule_id"),
             inverseJoinColumns = @JoinColumn(name = "batch_id")
     )
+    @JsonIgnore
     private Set<BatchEntity> batches = new HashSet<>();
 
     //relation with assignment
     @Builder.Default
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JsonIgnore
     private Set<AssignmentEntity> assignments = new HashSet<>();
 
     // Constructors, getters, and setters can be added here

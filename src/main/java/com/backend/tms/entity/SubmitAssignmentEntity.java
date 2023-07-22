@@ -25,4 +25,5 @@ public class SubmitAssignmentEntity {
     private String traineeName;
     private String submitFileUrl;
     private Date createdTime;
+    private String submittedStatus;
 }

@@ -13,6 +13,7 @@ import java.util.Set;
 public interface TrainerRepository extends JpaRepository<TrainerEntity, Long> {
     TrainerEntity findByEmail (String email);
     boolean existsById(Long id);
+    TrainerEntity findByCoursesName(String courseName);
     TrainerEntity findByCoursesContains(CourseEntity course);
 
 

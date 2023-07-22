@@ -143,7 +143,7 @@ public class AssignmentServiceImp implements AssignmentService {
             assignmentMap.put("type", assignmentEntity.getType());
             assignmentMap.put("deadline", assignmentEntity.getDeadline());
             assignmentMap.put("fileUrl", assignmentEntity.getFileUrl());
-
+            assignmentMap.put("description", assignmentEntity.getDescription());
             // Fetch the scheduleEntity from the scheduleRepository using the scheduleId
             ScheduleBatchEntity scheduleEntity = scheduleRepository.findById(assignmentEntity.getScheduleId())
                     .orElseThrow(() -> new ScheduleNotFoundException("Schedule not found for assignment with ID: " + assignmentEntity.getId()));
@@ -179,6 +179,7 @@ public class AssignmentServiceImp implements AssignmentService {
             assignmentMap.put("name", assignmentEntity.getName());
             assignmentMap.put("type", assignmentEntity.getType());
             assignmentMap.put("deadline", assignmentEntity.getDeadline());
+            assignmentMap.put("description", assignmentEntity.getDescription());
             assignmentMap.put("fileUrl", assignmentEntity.getFileUrl());
             // Fetch the scheduleEntity from the scheduleRepository using the scheduleId
             ScheduleBatchEntity scheduleEntity = scheduleRepository.findById(assignmentEntity.getScheduleId())

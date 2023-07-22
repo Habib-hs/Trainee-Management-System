@@ -19,7 +19,7 @@ public class ScheduleBatchReqModel {
     private String courseName;
     private String courseType;
     private Timestamp startDate;
-    private  Timestamp endDate;
+    private Timestamp endDate;
     private String courseId;
     private List<Long> batchesIds;
 

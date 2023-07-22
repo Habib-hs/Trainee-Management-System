@@ -18,6 +18,7 @@ public class AssignmentReqModel {
     private Long scheduleId;
     private Long trainerId;
     private String name;
+    private String description;
     private String type;
     private Date deadline;
     private MultipartFile file;

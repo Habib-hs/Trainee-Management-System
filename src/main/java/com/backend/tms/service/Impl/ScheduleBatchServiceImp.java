@@ -10,6 +10,7 @@ import com.backend.tms.model.ScheduleBatch.ScheduleBatchReqModel;
 import com.backend.tms.repository.BatchRepository;
 import com.backend.tms.repository.CourseRepository;
 import com.backend.tms.repository.ScheduleRepository;
+import com.backend.tms.repository.TrainerRepository;
 import com.backend.tms.service.ScheduleBatchService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -26,6 +27,7 @@ public class ScheduleBatchServiceImp implements ScheduleBatchService {
     private final ScheduleRepository scheduleRepository;
     private final CourseRepository courseRepository;
     private final BatchRepository batchRepository;
+    private final TrainerRepository trainerRepository;
 
     @Override
     public ResponseEntity<Object> createScheduleBatch(ScheduleBatchReqModel scheduleBatchModel) {
@@ -60,21 +62,40 @@ public class ScheduleBatchServiceImp implements ScheduleBatchService {
     @Override
     public ResponseEntity<Object> getScheduleNames() {
         List<ScheduleBatchEntity> scheduleEntities = scheduleRepository.findAll();
+
         // Create a response object
         List<Map<String, Object>> schedules = new ArrayList<>();
         for (ScheduleBatchEntity schedule : scheduleEntities) {
             Map<String, Object> scheduleData = new HashMap<>();
             scheduleData.put("id", schedule.getId());
             scheduleData.put("name", schedule.getCourseName());
+            scheduleData.put("startingDate", schedule.getStartDate());
+            scheduleData.put("endingDate", schedule.getEndDate());
+            scheduleData.put("courseType", schedule.getCourseType());
+
+            //getting the trainer name
+            TrainerEntity trainer = trainerRepository.findByCoursesName(schedule.getCourseName());
+            if (trainer != null) {
+                scheduleData.put("trainerId", trainer.getId());
+            }
+            // Getting batches info.
+            Set<BatchEntity> batches = schedule.getBatches();
+            List<String> batchNames = new ArrayList<>();
+            for (BatchEntity batch : batches) {
+                batchNames.add(batch.getBatchName());
+            }
+            scheduleData.put("batchNames", batchNames);
+
             schedules.add(scheduleData);
         }
         // Create the final response
         Map<String, Object> response = new HashMap<>();
         response.put("Total Schedule", schedules.size());
         response.put("Schedules", schedules);
-        return new ResponseEntity<>(response, HttpStatus.OK);
 
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
 
     private boolean isCommonCourseTimeValid(ScheduleBatchReqModel scheduleBatchModel) {
         LocalDateTime startDate = scheduleBatchModel.getStartDate().toLocalDateTime();
@@ -113,7 +134,7 @@ public class ScheduleBatchServiceImp implements ScheduleBatchService {
                     .orElseThrow(() -> new BatchNotFoundException("Batch not found with ID: " + batchId));
 
             for (ScheduleBatchEntity existingSchedule : batch.getSchedulePrograms()) {
-                if (existingSchedule.getCourseType().equals("common")) {
+                if (existingSchedule.getCourseType().equals("Common")) {
                     continue; // Skip common course schedules
                 }
 
@@ -162,7 +183,6 @@ public class ScheduleBatchServiceImp implements ScheduleBatchService {
                 batchEntities.add(batch);
                 scheduleBatchEntity.setBatches(batchEntities);
             }
-
         }
         return scheduleBatchEntity;
     }

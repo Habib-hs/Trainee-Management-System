@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 
 @Service
@@ -58,17 +59,48 @@ public class SubmitAssignmentServiceImp implements SubmitAssignmentService {
             Date currentTime = new Date();
             subAssignmentEntity.setCreatedTime(currentTime);
             subAssignmentEntity.setTraineeName(trainee.getFullName());
-            submitAssignmentRepository.save(subAssignmentEntity);
 
             // Update the assignment with the submission details
             Optional<AssignmentEntity> assignment = assignmentRepository.findById(assignmentId);
-            if (assignment.isPresent()) {
-                AssignmentEntity assignmentEntity = assignment.get();
-                assignmentEntity.getSubAssignments().add(subAssignmentEntity);
-                assignmentRepository.save(assignmentEntity);
-            } else {
+            if(!assignment.isPresent()){
                 throw new AssignmentNotFoundException("Assignment Not Found!");
             }
+
+            // Fetch the assignment deadline from the AssignmentEntity
+            Date deadline = assignment.get().getDeadline();
+
+
+            // Compare the deadline with the current time
+            if (currentTime.after(deadline)) {
+                // If current time is after the deadline, set the submission status as delayed
+                long delayInMillis = currentTime.getTime() - deadline.getTime();
+                long delayInMinutes = TimeUnit.MILLISECONDS.toMinutes(delayInMillis);
+                long delayInHours = TimeUnit.MILLISECONDS.toHours(delayInMillis);
+                long delayInDays = TimeUnit.MILLISECONDS.toDays(delayInMillis);
+
+                // Set the delayed status message based on the time difference
+                String delayedStatus = "Delayed ";
+                if (delayInDays > 0) {
+                    delayedStatus += delayInDays + " days";
+                } else if (delayInHours > 0) {
+                    delayedStatus += delayInHours + " hours";
+                } else {
+                    delayedStatus += delayInMinutes + " minutes";
+                }
+
+                subAssignmentEntity.setSubmittedStatus(delayedStatus);
+            } else {
+                // If current time is on or before the deadline, set the submission status as in-time
+                subAssignmentEntity.setSubmittedStatus("In-time");
+            }
+
+            submitAssignmentRepository.save(subAssignmentEntity);
+
+            // Update the relationship between AssignmentEntity and SubmitAssignmentEntity
+            AssignmentEntity assignmentEntity = assignment.get();
+            assignmentEntity.getSubAssignments().add(subAssignmentEntity);
+            assignmentRepository.save(assignmentEntity);
+
             // Return a success response
             return ResponseEntity.status(HttpStatus.CREATED).body("Assignment submitted successfully");
 
