@@ -67,11 +67,21 @@ public class BatchServiceImp implements BatchService {
     public ResponseEntity<Object> getAllBatches() {
         List<BatchEntity> batchEntities = batchRepository.findAll();
         // Create a response object
-        Map<String, Object> response = new HashMap<>();
-        response.put("Total Batch", batchEntities.size());
-        response.put("Batches", batchEntities);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        List<Map<String, Object>> batchesResponse = new ArrayList<>();
+        for (BatchEntity batch : batchEntities) {
+            Map<String, Object> batchResponse = new HashMap<>();
+            batchResponse.put("Id", batch.getId());
+            batchResponse.put("BatchName", batch.getBatchName());
+            batchResponse.put("StartDate", batch.getStartDate());
+            batchResponse.put("EndDate", batch.getEndDate());
+            batchResponse.put("TraineeCount", batch.getTrainees().size());
+            batchResponse.put("TrainerCount", batch.getTrainers().size());
+            batchResponse.put("ScheduleProgramCount", batch.getSchedulePrograms().size());
+            batchesResponse.add(batchResponse);
+        }
+        return new ResponseEntity<>(batchesResponse, HttpStatus.OK);
     }
+
 
     @Override
     public ResponseEntity<Object> getAllBatchName() {

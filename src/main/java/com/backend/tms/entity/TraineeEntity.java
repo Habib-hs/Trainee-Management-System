@@ -6,7 +6,7 @@ import lombok.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 @Entity
 @Table(name = "trainees")
 @Data
@@ -34,6 +34,7 @@ public class TraineeEntity {
     private String presentAddress;
 
     @OneToOne (cascade = CascadeType.ALL)
+    @JsonIgnore
     private UserEntity user;
 
     @Override

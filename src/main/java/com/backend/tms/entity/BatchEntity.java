@@ -1,5 +1,6 @@
 package com.backend.tms.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,6 +30,7 @@ public class BatchEntity {
     // Relation with trainee
     @Builder.Default
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JsonIgnore
     private Set<TraineeEntity> trainees = new HashSet<>();
 
     // Relation with trainer
@@ -39,10 +41,12 @@ public class BatchEntity {
             joinColumns = @JoinColumn(name = "batch_id"),
             inverseJoinColumns = @JoinColumn(name = "trainer_id")
     )
+    @JsonIgnore
     private Set<TrainerEntity> trainers = new HashSet<>();
 
     // Relation with classroom
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JsonIgnore
     private ClassroomEntity classroom;
 
     @Override
@@ -61,5 +65,6 @@ public class BatchEntity {
     // Relation with batchSchedule
     @Builder.Default
     @ManyToMany(mappedBy = "batches")
+    @JsonIgnore
     private Set<ScheduleBatchEntity> schedulePrograms = new HashSet<>();
 }

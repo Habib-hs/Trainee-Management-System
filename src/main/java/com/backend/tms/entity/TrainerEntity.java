@@ -1,5 +1,6 @@
 package com.backend.tms.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +10,7 @@ import lombok.NoArgsConstructor;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 @Entity
 @Table(name = "trainers")
 @Data
@@ -32,16 +33,19 @@ public class TrainerEntity {
 
     //making relation with user
     @OneToOne(cascade = CascadeType.ALL)
+    @JsonIgnore
     private UserEntity user;
 
     //relation with course
     @Builder.Default
     @OneToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
+    @JsonIgnore
     private Set<CourseEntity> courses = new HashSet<>();
 
     //relation with batch
     @Builder.Default
     @ManyToMany(mappedBy = "trainers")
+    @JsonIgnore
     private Set<BatchEntity> batches = new HashSet<>();
 
 
