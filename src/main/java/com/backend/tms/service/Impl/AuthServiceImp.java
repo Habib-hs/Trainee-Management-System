@@ -54,7 +54,7 @@ public class AuthServiceImp implements AuthService {
                 .id(adminModel.getId()) // Set the ID explicitly
                 .email(adminModel.getEmail())
                 .password(passwordEncoder.encode(adminModel.getPassword()))
-                .role("Admin")
+                .role("ADMIN")
                 .build();
 
         // Save the UserEntity to generate the ID
@@ -80,7 +80,7 @@ public class AuthServiceImp implements AuthService {
                 .id(traineeModel.getId())
                 .email(traineeModel.getEmail())
                 .password(passwordEncoder.encode(traineeModel.getPassword()))
-                .role("Trainee")
+                .role("TRAINEE")
                 .build();
 
         // Save the UserEntity to generate the ID
@@ -109,7 +109,7 @@ public class AuthServiceImp implements AuthService {
                 .id(trainerModel.getId()) // Set the ID explicitly
                 .email(trainerModel.getEmail())
                 .password(passwordEncoder.encode(trainerModel.getPassword()))
-                .role("Trainer")
+                .role("TRAINER")
                 .build();
 
         // Save the UserEntity to generate the ID
