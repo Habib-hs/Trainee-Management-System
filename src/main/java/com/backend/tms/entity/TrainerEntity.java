@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -25,7 +26,7 @@ public class TrainerEntity {
     private String profilePicture;
     private String email;
     private String designation;
-    private String joiningDate;
+    private Date joiningDate;
     private int yearsOfExperience;
     private String expertises;
     private String contactNumber;

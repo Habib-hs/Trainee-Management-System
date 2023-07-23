@@ -43,7 +43,7 @@ public class TrainerController {
     @PutMapping("/update/{id}")
     public ResponseEntity<Object> updateTrainer(
             @PathVariable("id") Long trainerId,
-            @RequestBody TrainerUpdateReqModel trainerModel
+            @ModelAttribute TrainerUpdateReqModel trainerModel
     ) {
         return trainerService.updateTrainer(trainerId, trainerModel);
     }

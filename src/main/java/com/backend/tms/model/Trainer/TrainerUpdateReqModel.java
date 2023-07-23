@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.Date;
 
 @Data
 @NoArgsConstructor
@@ -11,9 +14,9 @@ import lombok.NoArgsConstructor;
 @Builder
 public class TrainerUpdateReqModel {
     private String fullName;
-    private String profilePicture;
+    private MultipartFile profilePicture;
     private String designation;
-    private String joiningDate;
+    private Date joiningDate;
     private int yearsOfExperience;
     private String expertises;
     private String contactNumber;

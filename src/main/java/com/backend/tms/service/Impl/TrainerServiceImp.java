@@ -9,11 +9,14 @@ import com.backend.tms.model.Trainer.TrainerUpdateReqModel;
 import com.backend.tms.repository.BatchRepository;
 import com.backend.tms.repository.TrainerRepository;
 import com.backend.tms.service.TrainerService;
+import com.backend.tms.utlis.AppConstants;
+import com.backend.tms.utlis.FileService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -31,9 +34,20 @@ public class TrainerServiceImp implements TrainerService {
         TrainerEntity trainerEntity = trainerRepository.findById(trainerId)
                 .orElseThrow(() -> new TrainerNotFoundException("Trainer not found with ID: " + trainerId));
 
+        MultipartFile file = trainerModel.getProfilePicture();
+        String fileUrl = null;
+        if (file != null && !file.isEmpty()) {
+            try {
+                fileUrl = FileService.uploadImage(file, AppConstants.IMAGE_UPLOAD_DIR);
+            } catch (IllegalArgumentException e) {
+                return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            }
+            // Set the profile picture URL only if the image upload was successful
+            trainerEntity.setProfilePicture(fileUrl);
+        }
+
         //update the trainer Entity
         trainerEntity.setFullName(trainerModel.getFullName());
-        trainerEntity.setProfilePicture(trainerModel.getProfilePicture());
         trainerEntity.setDesignation(trainerModel.getDesignation());
         trainerEntity.setJoiningDate(trainerModel.getJoiningDate());
         trainerEntity.setYearsOfExperience(trainerModel.getYearsOfExperience());
@@ -42,7 +56,7 @@ public class TrainerServiceImp implements TrainerService {
         trainerEntity.setPresentAddress(trainerModel.getPresentAddress());
         trainerRepository.save(trainerEntity);
         // Return a success message
-        return new ResponseEntity<>("Trainee updated successfully", HttpStatus.OK);
+        return new ResponseEntity<>("Trainer updated successfully", HttpStatus.OK);
 
     }
     @Override
