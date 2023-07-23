@@ -23,11 +23,15 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
+                .cors()
+                .and()
                 .csrf()
                 .disable()
                 .authorizeHttpRequests()
               //  .requestMatchers("/**")
               //  .permitAll()
+                .requestMatchers("/admin/register")
+                .permitAll()
                 .requestMatchers("/login")
                 .permitAll()
                 .anyRequest()

@@ -26,17 +26,20 @@ public class AuthController {
     }
 
     @PostMapping("/admin/register")
+    @PreAuthorize(" hasRole('ADMIN')")
     public ResponseEntity<Object> createAdmin(@RequestBody AdminReqModel adminModel) {
         return authService.registerAdmin(adminModel);
     }
 
 
     @PostMapping("/trainee/register")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Object> createTrainee(@RequestBody TraineeReqModel traineeModel) {
         return authService.registerTrainee(traineeModel);
     }
 
     @PostMapping("/trainer/register")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Object> createTrainer(@RequestBody TrainerReqModel trainerModel) {
         return authService.registerTrainer(trainerModel);
     }
