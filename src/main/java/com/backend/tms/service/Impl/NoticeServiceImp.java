@@ -63,6 +63,7 @@ public class NoticeServiceImp implements NoticeService {
             }
             NoticeEntity createdNotice = noticeRepository.save(noticeEntity);
             classroomEntity.getNotices().add(createdNotice);
+            classroomRepository.save(classroomEntity);
             return ResponseEntity.status(HttpStatus.CREATED).body("Notice created successfully");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to create Notice");
