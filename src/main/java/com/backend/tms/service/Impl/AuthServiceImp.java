@@ -4,7 +4,9 @@ import com.backend.tms.entity.AdminEntity;
 import com.backend.tms.entity.TraineeEntity;
 import com.backend.tms.entity.TrainerEntity;
 import com.backend.tms.entity.UserEntity;
+import com.backend.tms.exception.custom.AdminAlreadyExistException;
 import com.backend.tms.exception.custom.TraineeAlreadyExistsException;
+import com.backend.tms.exception.custom.TrainerAlreadyExistException;
 import com.backend.tms.model.Admin.AdminReqModel;
 import com.backend.tms.model.Admin.AdminResModel;
 import com.backend.tms.model.Common.AuthenticationReqModel;
@@ -44,7 +46,7 @@ public class AuthServiceImp implements AuthService {
 
         UserEntity userEntityByEmail = userRepository.findByEmail(adminModel.getEmail());
         if (userEntityByEmail != null) {
-            System.out.println("Admin already exists with the given email");
+            throw new AdminAlreadyExistException("User already exists with the given email");
         }
 
         // Create a new UserEntity
@@ -61,11 +63,11 @@ public class AuthServiceImp implements AuthService {
         //mapping the admin
         AdminEntity admin = modelMapper.map(adminModel, AdminEntity.class);
         admin.setUser(newUser); // Set the UserEntity as the associated user
-
         // Save the AdminEntity
         adminRepository.save(admin);
         return new ResponseEntity<>("admin created successfully", HttpStatus.OK);
     }
+
 
     @Override
     public ResponseEntity<Object> registerTrainee(TraineeReqModel traineeModel) {
@@ -100,7 +102,7 @@ public class AuthServiceImp implements AuthService {
 
         // Check if the trainer with the given email already exists
         if (userRepository.findByEmail(trainerModel.getEmail()) != null) {
-            throw new TraineeAlreadyExistsException("User already exists with the given email");
+            throw new TrainerAlreadyExistException("User already exists with the given email");
         }
 
         // Create a new UserEntity

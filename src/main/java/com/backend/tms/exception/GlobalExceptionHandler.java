@@ -23,6 +23,7 @@ public class GlobalExceptionHandler {
             AssignmentNotFoundException.class,
             PostNotFoundException.class,
             IllegalArgumentException.class,
+            AdminAlreadyExistException.class,
             FileNotFoundException.class,
             CommentNotFoundException.class,
             NoticeNotFoundException.class,
@@ -60,6 +61,8 @@ public class GlobalExceptionHandler {
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
         } else if (ex instanceof  ClassroomNotFoundException){
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+        } else if (ex instanceof  AdminAlreadyExistException){
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
         } else{
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
