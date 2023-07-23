@@ -37,7 +37,7 @@ public class TraineeController {
     @PutMapping("/update/{id}")
     public ResponseEntity<Object> updateTrainee(
             @PathVariable("id") Long traineeId,
-            @RequestBody TraineeUpdateReqModel traineeModel
+            @ModelAttribute TraineeUpdateReqModel traineeModel
     ) {
         return traineeService.updateTrainee(traineeId, traineeModel);
     }

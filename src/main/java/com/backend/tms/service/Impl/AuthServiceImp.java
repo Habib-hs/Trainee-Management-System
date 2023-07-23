@@ -68,7 +68,6 @@ public class AuthServiceImp implements AuthService {
         return new ResponseEntity<>("admin created successfully", HttpStatus.OK);
     }
 
-
     @Override
     public ResponseEntity<Object> registerTrainee(TraineeReqModel traineeModel) {
 

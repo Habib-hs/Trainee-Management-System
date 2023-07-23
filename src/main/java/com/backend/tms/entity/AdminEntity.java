@@ -1,5 +1,6 @@
 package com.backend.tms.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,7 +22,7 @@ public class AdminEntity {
     private String email;
     private String contactNumber;
 
-    @OneToOne (cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL)
     private UserEntity user;
 
 

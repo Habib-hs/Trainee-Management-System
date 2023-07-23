@@ -4,9 +4,12 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.web.multipart.MultipartFile;
+
 @Entity
 @Table(name = "trainees")
 @Data
@@ -22,7 +25,7 @@ public class TraineeEntity {
     private String fullName;
     private String profilePicture;
     private String gender;
-    private String dateOfBirth;
+    private Date dateOfBirth;
     private String email;
     private String password;
     private String domain;

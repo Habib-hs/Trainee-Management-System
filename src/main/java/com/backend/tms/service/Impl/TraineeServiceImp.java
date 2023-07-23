@@ -9,11 +9,14 @@ import com.backend.tms.model.Trainee.TraineeUpdateReqModel;
 import com.backend.tms.repository.BatchRepository;
 import com.backend.tms.repository.TraineeRepository;
 import com.backend.tms.service.TraineeService;
+import com.backend.tms.utlis.AppConstants;
+import com.backend.tms.utlis.FileService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
 import java.util.List;
@@ -73,7 +76,6 @@ public class TraineeServiceImp implements TraineeService {
     }
 
 
-
     @Override
     public ResponseEntity<Object> getTraineeById(Long traineeId) {
         Optional<TraineeEntity> traineeEntity = traineeRepository.findById(traineeId);
@@ -90,20 +92,35 @@ public class TraineeServiceImp implements TraineeService {
         TraineeEntity traineeEntity = traineeRepository.findById(traineeId)
                 .orElseThrow(() -> new TraineeNotFoundException("Trainee not found with ID: " + traineeId));
 
-        //update the trainee Entity
-                traineeEntity.setFullName(traineeModel.getFullName());
-                traineeEntity.setProfilePicture(traineeModel.getProfilePicture());
-                traineeEntity.setGender(traineeModel.getGender());
-                traineeEntity.setDateOfBirth(traineeModel.getDateOfBirth());
-                traineeEntity.setContactNumber(traineeModel.getContactNumber());
-                traineeEntity.setDegreeName(traineeModel.getDegreeName());
-                traineeEntity.setEducationalInstitute(traineeModel.getEducationalInstitute());
-                traineeEntity.setCgpa(traineeModel.getCgpa());
-                traineeEntity.setCgpa(traineeModel.getPassingYear());
-                traineeEntity.setPresentAddress(traineeModel.getPresentAddress());
-                traineeRepository.save(traineeEntity);
-           // Return a success message
-          return new ResponseEntity<>("Trainee updated successfully", HttpStatus.OK);
+        MultipartFile file = traineeModel.getProfilePicture();
+        String fileUrl = null;
+        if (file != null && !file.isEmpty()) {
+            try {
+                fileUrl = FileService.uploadImage(file, AppConstants.IMAGE_UPLOAD_DIR);
+            } catch (IllegalArgumentException e) {
+                return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            }
+
+            // Set the profile picture URL only if the image upload was successful
+            traineeEntity.setProfilePicture(fileUrl);
+        }
+
+        // Update other attributes of the trainee Entity
+        traineeEntity.setFullName(traineeModel.getFullName());
+        traineeEntity.setGender(traineeModel.getGender());
+        traineeEntity.setDateOfBirth(traineeModel.getDateOfBirth());
+        traineeEntity.setContactNumber(traineeModel.getContactNumber());
+        traineeEntity.setDegreeName(traineeModel.getDegreeName());
+        traineeEntity.setEducationalInstitute(traineeModel.getEducationalInstitute());
+        traineeEntity.setCgpa(traineeModel.getCgpa());
+        traineeEntity.setPassingYear(traineeModel.getPassingYear());
+        traineeEntity.setPresentAddress(traineeModel.getPresentAddress());
+
+        // Save the updated trainee Entity
+        traineeRepository.save(traineeEntity);
+
+        // Return a success message
+        return new ResponseEntity<>("Trainee updated successfully", HttpStatus.OK);
     }
 
     @Override
