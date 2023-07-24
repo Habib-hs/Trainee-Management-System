@@ -64,6 +64,7 @@ public class CommentServiceImp implements CommentService {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to create comment");
         }
     }
+
     @Override
     public ResponseEntity<Object> updateComment(Long commentId, CommentReqModel commentModel) {
         try {
@@ -78,7 +79,7 @@ public class CommentServiceImp implements CommentService {
 
             // Update the existing comment
             existingComment.setComment(commentModel.getComment());
-           // existingComment.setUpdatedAt(new Date());
+            // existingComment.setUpdatedAt(new Date());
             CommentEntity updatedComment = commentRepository.save(existingComment);
 
             return ResponseEntity.status(HttpStatus.OK).body("Comment updated successfully");
@@ -89,6 +90,31 @@ public class CommentServiceImp implements CommentService {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update comment");
         }
+    }
+
+    @Override
+    public ResponseEntity<Object> deleteComment(Long commentId) {
+        Optional<CommentEntity> commentOptional = commentRepository.findById(commentId);
+
+        if (commentOptional.isEmpty()) {
+            throw new CommentNotFoundException("Comment not found");
+        }
+
+        CommentEntity existingComment = commentOptional.get();
+        Long postId = existingComment.getPostId();
+        Optional<PostEntity> postOptional = postRepository.findById(postId);
+
+        if (postOptional.isEmpty()) {
+            throw new PostNotFoundException("Post not found!");
+        }
+
+        PostEntity post = postOptional.get();
+        post.getComments().remove(existingComment);
+        postRepository.save(post);
+
+        commentRepository.delete(existingComment);
+
+        return ResponseEntity.status(HttpStatus.OK).body("Comment deleted successfully");
     }
 
 

@@ -25,4 +25,10 @@ public class CommentController {
         return commentService.updateComment(postId, commentModel);
     }
 
+    @DeleteMapping("/{commentId}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('TRAINER') oe hasRole('TRAINEE')")
+    public ResponseEntity<Object> deleteComment(@PathVariable("commentId") Long commentId) {
+        return commentService.deleteComment(commentId);
+    }
+
 }
