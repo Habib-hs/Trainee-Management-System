@@ -19,17 +19,6 @@ public class TrainerController {
         return trainerService.getAllTrainers();
     }
 
-    @GetMapping("/get/all")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Object> getAllTrainer() {
-        return trainerService.getAllTrainer();
-    }
-
-    @GetMapping("/get/allName")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Object> getTrainerIdAndName(){
-        return trainerService.getTrainerIdAndName();
-    };
 
     @GetMapping("/classroom/{id}")
     @PreAuthorize("hasRole('TRAINER')")
@@ -43,6 +32,12 @@ public class TrainerController {
         return trainerService.getTrainerById(trainerId);
     }
 
+    @GetMapping("/get/allName")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Object> getTrainerIdAndName(){
+        return trainerService.getTrainerIdAndName();
+    };
+
     @PutMapping("/update/{id}")
     @PreAuthorize("hasRole('TRAINER'))")
     public ResponseEntity<Object> updateTrainer(
@@ -53,7 +48,7 @@ public class TrainerController {
     }
 
     @DeleteMapping("delete/{id}")
-    @PreAuthorize("hasRole('TRAINER')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Object> deleteTrainer(@PathVariable("id") Long trainerId) {
         return trainerService.deleteTrainer(trainerId);
     }

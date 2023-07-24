@@ -3,11 +3,13 @@ package com.backend.tms.service.Impl;
 import com.backend.tms.entity.BatchEntity;
 import com.backend.tms.entity.TraineeEntity;
 import com.backend.tms.entity.TrainerEntity;
+import com.backend.tms.entity.UserEntity;
 import com.backend.tms.exception.custom.TrainerNotFoundException;
 import com.backend.tms.model.Trainer.TrainerResModel;
 import com.backend.tms.model.Trainer.TrainerUpdateReqModel;
 import com.backend.tms.repository.BatchRepository;
 import com.backend.tms.repository.TrainerRepository;
+import com.backend.tms.repository.UserRepository;
 import com.backend.tms.service.TrainerService;
 import com.backend.tms.utlis.AppConstants;
 import com.backend.tms.utlis.FileService;
@@ -27,6 +29,7 @@ public class TrainerServiceImp implements TrainerService {
     private final ModelMapper modelMapper;
     private final TrainerRepository trainerRepository;
     private final BatchRepository batchRepository;
+    private final UserRepository userRepository;
 
     @Override
     public ResponseEntity<Object> updateTrainer(Long trainerId, TrainerUpdateReqModel trainerModel) {
@@ -67,25 +70,6 @@ public class TrainerServiceImp implements TrainerService {
         response.put("Total Trainer", trainerEntityList.size());
         response.put("Trainer", trainerEntityList);
         return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-
-    @Override
-    public ResponseEntity<Object> getAllTrainer() {
-        List<Long> assignedTrainerIds = batchRepository.findAll().stream()
-                .flatMap(batch -> batch.getTrainers().stream())
-                .map(TrainerEntity::getId)
-                .collect(Collectors.toList());
-
-        List<TrainerEntity> unassignedTrainer = trainerRepository.findAll().stream()
-                .filter(trainer -> !assignedTrainerIds.contains(trainer.getId()))
-                .collect(Collectors.toList());
-
-        // Create a response object
-        Map<String, Object> response = new HashMap<>();
-        response.put("Total Trainer", unassignedTrainer.size());
-        response.put("Trainer", unassignedTrainer);
-        return new ResponseEntity<>(response, HttpStatus.OK);
-
     }
 
     @Override
@@ -135,8 +119,11 @@ public class TrainerServiceImp implements TrainerService {
     @Override
     public ResponseEntity<Object> deleteTrainer(Long trainerId) {
         // Check if the Trainer exists
-        trainerRepository.findById(trainerId).orElseThrow(()->new TrainerNotFoundException("Trainer not found"));
-        // Delete the Trainer
+      TrainerEntity trainer=  trainerRepository.findById(trainerId).orElseThrow(()->new TrainerNotFoundException("Trainer not found"));
+        UserEntity user = trainer.getUser();
+        if(user!=null){
+            userRepository.delete(user);
+        }
         trainerRepository.deleteById(trainerId);
         return new ResponseEntity<>("Trainer deleted successfully", HttpStatus.OK);
     }

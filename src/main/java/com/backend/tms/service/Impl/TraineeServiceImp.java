@@ -131,7 +131,6 @@ public class TraineeServiceImp implements TraineeService {
        TraineeEntity trainee= traineeRepository.findById(traineeId).orElseThrow(()->new TraineeNotFoundException("Trainee not found"));
         // Retrieve the associated UserEntity
         UserEntity user = trainee.getUser();
-
         if (user != null) {
             userRepository.delete(user);
         }
