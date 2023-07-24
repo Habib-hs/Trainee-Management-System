@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class ClassroomController {
     private final ClassroomService classroomService;
-    @GetMapping("/get")
+    @GetMapping("/get/all")
     @PreAuthorize("hasRole('TRAINEE') or hasRole('TRAINER')")
     public ResponseEntity<Object> getAllClassroom() {
         return classroomService.getAllClassroomName();
