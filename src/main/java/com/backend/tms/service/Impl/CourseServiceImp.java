@@ -1,6 +1,5 @@
 package com.backend.tms.service.Impl;
 
-import com.backend.tms.entity.BatchEntity;
 import com.backend.tms.entity.CourseEntity;
 import com.backend.tms.entity.TrainerEntity;
 import com.backend.tms.exception.custom.CourseAlreadyExistsException;
@@ -55,8 +54,23 @@ public class CourseServiceImp implements CourseService {
 
     @Override
     public ResponseEntity<Object> deleteCourse(Long courseId) {
-        return null;
+        // Check if the course exists
+        CourseEntity courseEntity = courseRepository.findById(courseId)
+                .orElseThrow(() -> new CourseNotFoundException("Course not found with ID: " + courseId));
+
+        // Get the assigned trainer for the course
+        TrainerEntity assignedTrainer = trainerRepository.findById(courseEntity.getAssignedTrainerId())
+                .orElseThrow(() -> new TrainerNotFoundException("Trainer not found with ID: " + courseEntity.getAssignedTrainerId()));
+
+        // Remove the course & course's signed trainer's list from courses
+        assignedTrainer.getCourses().remove(courseEntity);
+        courseRepository.deleteById(courseId);
+        trainerRepository.save(assignedTrainer);
+
+        // Return a success message
+        return new ResponseEntity<>("Course deleted successfully", HttpStatus.OK);
     }
+
 
     @Override
     public ResponseEntity<Object> updateCourse(Long courseId, CourseReqModel courseModel) {
@@ -66,10 +80,10 @@ public class CourseServiceImp implements CourseService {
 
         // Update the batch details
         courseEntity.setName(courseModel.getName());
-       courseEntity.setDescription(courseModel.getDescription());
-       courseEntity.setAssignedTrainerId(courseModel.getAssignedTrainerId());
-       courseEntity.setTrainerName(courseModel.getTrainerName());
-       courseRepository.save(courseEntity);
+        courseEntity.setDescription(courseModel.getDescription());
+        courseEntity.setAssignedTrainerId(courseModel.getAssignedTrainerId());
+        courseEntity.setTrainerName(courseModel.getTrainerName());
+        courseRepository.save(courseEntity);
 
         // Return a success message
         return new ResponseEntity<>("Course updated successfully", HttpStatus.OK);
