@@ -62,7 +62,7 @@ public class CourseServiceImp implements CourseService {
         TrainerEntity assignedTrainer = trainerRepository.findById(courseEntity.getAssignedTrainerId())
                 .orElseThrow(() -> new TrainerNotFoundException("Trainer not found with ID: " + courseEntity.getAssignedTrainerId()));
 
-        // Remove the course & course's signed trainer's list from courses
+        // Remove the course & course's signed trainer's list from the courses
         assignedTrainer.getCourses().remove(courseEntity);
         courseRepository.deleteById(courseId);
         trainerRepository.save(assignedTrainer);
