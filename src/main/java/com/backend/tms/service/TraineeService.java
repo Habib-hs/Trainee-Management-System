@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface TraineeService {
     ResponseEntity<Object> getAllTrainees();
-    ResponseEntity<Object> getAllTrainee();
+    ResponseEntity<Object> getAllUnAssignedTrainee();
     ResponseEntity<Object> getBatchByTraineeId(Long traineeId);
     ResponseEntity<Object> getTraineeById(Long traineeId);
     ResponseEntity<Object> updateTrainee(Long traineeId, TraineeUpdateReqModel traineeModel);

@@ -16,25 +16,23 @@ public class TraineeController {
     private final TraineeService traineeService;
 
     @GetMapping("/get/all")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('TRAINER')")
     public ResponseEntity<Object> getAllTrainees() {
         return traineeService.getAllTrainees();
     }
 
-    @GetMapping("/gets/all")
+    @GetMapping("/get/unassigned-trainee")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Object> getAllTrainee() {
-        return traineeService.getAllTrainee();
-    }
+    public ResponseEntity<Object> getAllUnAssignedTrainee() {return traineeService.getAllUnAssignedTrainee();}
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('TRAINER') or hasRole('TRAINEE')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('TRAINER') or hasRole('TRAINEE')")
     public ResponseEntity<Object> getTraineeById(@PathVariable("id") Long traineeId) {
         return traineeService.getTraineeById(traineeId);
     }
 
     @GetMapping("/classroom/{id}")
-    @PreAuthorize("hasRole('TRAINEE')")
+    @PreAuthorize("hasRole('TRAINEE') or hasRole('ADMIN') or hasRole('TRAINER')")
     public ResponseEntity<Object> getBatchByTraineeId(@PathVariable("id") Long traineeId) {
         return traineeService. getBatchByTraineeId(traineeId);
     }

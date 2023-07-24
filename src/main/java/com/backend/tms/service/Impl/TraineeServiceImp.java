@@ -3,11 +3,13 @@ package com.backend.tms.service.Impl;
 
 import com.backend.tms.entity.BatchEntity;
 import com.backend.tms.entity.TraineeEntity;
+import com.backend.tms.entity.UserEntity;
 import com.backend.tms.exception.custom.TraineeNotFoundException;
 import com.backend.tms.model.Trainee.TraineeResModel;
 import com.backend.tms.model.Trainee.TraineeUpdateReqModel;
 import com.backend.tms.repository.BatchRepository;
 import com.backend.tms.repository.TraineeRepository;
+import com.backend.tms.repository.UserRepository;
 import com.backend.tms.service.TraineeService;
 import com.backend.tms.utlis.AppConstants;
 import com.backend.tms.utlis.FileService;
@@ -32,6 +34,7 @@ public class TraineeServiceImp implements TraineeService {
     private final TraineeRepository traineeRepository;
     private final ModelMapper modelMapper;
     private final BatchRepository batchRepository;
+    private final UserRepository userRepository;
 
     @Override
     public ResponseEntity<Object> getAllTrainees() {
@@ -44,7 +47,7 @@ public class TraineeServiceImp implements TraineeService {
     }
 
     @Override
-    public ResponseEntity<Object> getAllTrainee() {
+    public ResponseEntity<Object> getAllUnAssignedTrainee() {
         List<Long> assignedTraineeIds = batchRepository.findAll().stream()
                 .flatMap(batch -> batch.getTrainees().stream())
                 .map(TraineeEntity::getId)
@@ -80,7 +83,7 @@ public class TraineeServiceImp implements TraineeService {
     public ResponseEntity<Object> getTraineeById(Long traineeId) {
         Optional<TraineeEntity> traineeEntity = traineeRepository.findById(traineeId);
         if(traineeEntity ==null){
-            throw new TraineeNotFoundException("Course not found with ID: " + traineeId);
+            throw new TraineeNotFoundException("trainee not found with ID: " + traineeId);
         }
         TraineeResModel trainee = modelMapper.map(traineeEntity, TraineeResModel.class);
         return new ResponseEntity<>(trainee, HttpStatus.OK);
@@ -100,7 +103,6 @@ public class TraineeServiceImp implements TraineeService {
             } catch (IllegalArgumentException e) {
                 return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
             }
-
             // Set the profile picture URL only if the image upload was successful
             traineeEntity.setProfilePicture(fileUrl);
         }
@@ -126,8 +128,14 @@ public class TraineeServiceImp implements TraineeService {
     @Override
     public ResponseEntity<Object> deleteTrainee(Long traineeId) {
         // Check if the batch exists
-        traineeRepository.findById(traineeId).orElseThrow(()->new TraineeNotFoundException("Trainee not found"));
-        // Delete the batch
+       TraineeEntity trainee= traineeRepository.findById(traineeId).orElseThrow(()->new TraineeNotFoundException("Trainee not found"));
+        // Retrieve the associated UserEntity
+        UserEntity user = trainee.getUser();
+
+        if (user != null) {
+            userRepository.delete(user);
+        }
+        // Delete the trainee
         traineeRepository.deleteById(traineeId);
         return new ResponseEntity<>("Trainee deleted successfully", HttpStatus.OK);
     }
