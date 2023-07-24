@@ -8,4 +8,7 @@ public class AppConstants {
     public static final String IMAGE_DOWNLOAD_DIR = "D:\\DOWNLOADED IMAGE";
     public static final String ASSIGNMENT_UPLOAD_DIR = "D:\\ALL ASSIGNMENT";
     public static final String ASSIGNMENT_DOWNLOAD_DIR = "D:\\ASSIGNMENT DOWNLOAD";
+
+    public static final String POST_UPLOAD_DIR = "D:\\ALL POSTS";
+    public static final String POST_DOWNLOAD_DIR = "D:\\POST DOWNLOAD";
 }

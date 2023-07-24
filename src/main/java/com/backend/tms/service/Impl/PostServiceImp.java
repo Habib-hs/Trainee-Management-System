@@ -7,6 +7,8 @@ import com.backend.tms.entity.TrainerEntity;
 import com.backend.tms.exception.custom.ClassroomNotFoundException;
 import com.backend.tms.model.Classroom.PostMessageReqModel;
 import com.backend.tms.repository.ClassroomRepository;
+import com.backend.tms.utlis.AppConstants;
+import com.backend.tms.utlis.FileService;
 import org.apache.commons.io.FileUtils;
 import com.backend.tms.exception.custom.BatchNotFoundException;
 import com.backend.tms.exception.custom.PostNotFoundException;
@@ -39,8 +41,7 @@ public class PostServiceImp implements PostService {
     private final ModelMapper modelMapper;
     private final ClassroomRepository classroomRepository;
 
-    private static final String UPLOAD_DIR = "D:\\TMS FILE FOR POSTS";
-    private static final String DOWNLOAD_DIR = "D:\\TMS FILE DOWNLOAD FOR POSTS";
+
 
     @Override
     public ResponseEntity<Object> createPost( PostReqModel postModel) {
@@ -55,16 +56,18 @@ public class PostServiceImp implements PostService {
 
             MultipartFile file = postModel.getFile();
             String fileUrl = null;
-
             if (file != null && !file.isEmpty()) {
-                fileUrl = uploadFile(file);
+                fileUrl = FileService.uploadFile(file, AppConstants.POST_UPLOAD_DIR );
             }
+
             PostEntity postEntity = modelMapper.map(postModel, PostEntity.class);
             if (fileUrl != null) {
                 postEntity.setFileUrl(fileUrl);
             }
+            //adding current time
             Date currentTime = new Date();
             postEntity.setCreatedTime(currentTime);
+
             PostEntity createdPost = postRepository.save(postEntity);
             classroomEntity.getPosts().add(createdPost);
             classroomRepository.save(classroomEntity);
@@ -103,7 +106,7 @@ public class PostServiceImp implements PostService {
 
             MultipartFile file = postModel.getFile();
             if (file != null && !file.isEmpty()) {
-                String fileUrl = uploadFile(file);
+                String fileUrl = FileService.uploadFile(file, AppConstants.POST_UPLOAD_DIR );
                 if (fileUrl == null) {
                     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload the file");
                 }
@@ -126,7 +129,7 @@ public class PostServiceImp implements PostService {
            String fileContents = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
            // Create a new file in the specified directory
            String fileName = StringUtils.cleanPath(file.getName());
-           File destinationDir = new File(DOWNLOAD_DIR);
+           File destinationDir = new File(AppConstants.POST_DOWNLOAD_DIR);
            if (!destinationDir.exists()) {
                destinationDir.mkdirs(); // Create the directory if it doesn't exist
            }
@@ -137,22 +140,6 @@ public class PostServiceImp implements PostService {
        }catch(Exception e){
            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to read or save the file");
         }
-    }
-
-    @Override
-    public ResponseEntity<Object> createPostMessage(PostMessageReqModel postModel) {
-        // Validate if the associated batch exists
-        BatchEntity batchEntity = batchRepository.findById(postModel.getBatchId())
-                .orElseThrow(() -> new BatchNotFoundException("Batch not found"));
-
-        // Validate if the associated trainer exists
-        TrainerEntity trainerEntity = trainerRepository.findById(postModel.getTrainerId())
-                .orElseThrow(() -> new TrainerNotFoundException("Trainer not found"));
-
-        PostEntity postEntity = modelMapper.map(postModel, PostEntity.class);
-        PostEntity createdPost = postRepository.save(postEntity);
-       // trainerEntity.getPosts().add(createdPost);
-        return ResponseEntity.status(HttpStatus.CREATED).body("Post created successfully");
     }
 
 
@@ -187,25 +174,6 @@ public class PostServiceImp implements PostService {
 
         response.put("Posts", postsWithTrainerName);
         return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-
-
-    private String uploadFile(MultipartFile file) {
-        if (file != null && !file.isEmpty()) {
-            try {
-                String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-                File destinationDir = new File(UPLOAD_DIR);
-                if (!destinationDir.exists()) {
-                    destinationDir.mkdirs(); // Create the directory if it doesn't exist
-                }
-                File destinationFile = new File(destinationDir, fileName);
-                file.transferTo(destinationFile);
-                return destinationFile.getAbsolutePath();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return null;
     }
 
 }

@@ -12,7 +12,6 @@ public interface PostService {
     ResponseEntity<Object> getPost(Long postId);
     ResponseEntity<Object> updatePost(Long postId, PostReqModel postModel);
     ResponseEntity<Object> downloadPostFile(Long postId);
-    public ResponseEntity<Object> createPostMessage(PostMessageReqModel postModel) ;
     public ResponseEntity<Object> getAllPostsByClassroom(Long classroomId);
 
 }

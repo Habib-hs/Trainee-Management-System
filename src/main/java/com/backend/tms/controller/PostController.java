@@ -20,12 +20,6 @@ public class PostController {
         return postService.createPost(postModel);
     }
 
-    @PostMapping("/message")
-    @PreAuthorize("hasRole('TRAINER')")
-    public ResponseEntity<Object> createPostMessage(@RequestBody PostMessageReqModel postModel) {
-        return postService.createPostMessage(postModel);
-    }
-
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('TRAINER') or hasRole('TRAINEE')")
     public ResponseEntity<Object> getPost(@PathVariable("id") Long postId) {
