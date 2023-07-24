@@ -43,6 +43,12 @@ public class BatchEntity {
     @JsonIgnore
     private Set<TrainerEntity> trainers = new HashSet<>();
 
+    // Relation with batchSchedule
+    @Builder.Default
+    @ManyToMany(mappedBy = "batches")
+    @JsonIgnore
+    private Set<ScheduleBatchEntity> schedulePrograms = new HashSet<>();
+
     // Relation with classroom
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JsonIgnore
@@ -61,9 +67,4 @@ public class BatchEntity {
         return Objects.hash(id);
     }
 
-    // Relation with batchSchedule
-    @Builder.Default
-    @ManyToMany(mappedBy = "batches")
-    @JsonIgnore
-    private Set<ScheduleBatchEntity> schedulePrograms = new HashSet<>();
 }
