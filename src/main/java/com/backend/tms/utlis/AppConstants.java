@@ -11,4 +11,7 @@ public class AppConstants {
 
     public static final String POST_UPLOAD_DIR = "D:\\ALL POSTS";
     public static final String POST_DOWNLOAD_DIR = "D:\\POST DOWNLOAD";
+
+    public static final String SUBMIT_ASSIGNMENT_UPLOAD_DIR = "D:\\ALL SUBMITTED ASSIGNMENT";
+    public static final String SUBMIT_ASSIGNMENT_DOWNLOAD_DIR = "D:\\SUBMITTED ASSIGNMENT DOWNLOAD";
 }

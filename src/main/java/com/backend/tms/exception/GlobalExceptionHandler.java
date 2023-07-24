@@ -27,7 +27,8 @@ public class GlobalExceptionHandler {
             FileNotFoundException.class,
             CommentNotFoundException.class,
             NoticeNotFoundException.class,
-            ClassroomNotFoundException.class
+            ClassroomNotFoundException.class,
+            SubmittedAssignmentNotFound.class
 
     })
     public ResponseEntity<Object> handleCustomException(Exception ex) {
@@ -63,6 +64,8 @@ public class GlobalExceptionHandler {
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
         } else if (ex instanceof  AdminAlreadyExistException){
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        } else if (ex instanceof  SubmittedAssignmentNotFound){
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
         } else{
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }

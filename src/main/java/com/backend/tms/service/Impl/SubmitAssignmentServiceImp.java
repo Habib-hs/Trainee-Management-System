@@ -1,15 +1,22 @@
 package com.backend.tms.service.Impl;
 
 import com.backend.tms.entity.AssignmentEntity;
+import com.backend.tms.entity.NoticeEntity;
 import com.backend.tms.entity.SubmitAssignmentEntity;
 import com.backend.tms.entity.TraineeEntity;
 import com.backend.tms.exception.custom.AssignmentNotFoundException;
+import com.backend.tms.exception.custom.FileNotFoundException;
+import com.backend.tms.exception.custom.NoticeNotFoundException;
+import com.backend.tms.exception.custom.SubmittedAssignmentNotFound;
 import com.backend.tms.model.Classroom.SubmitAssignmentReqModel;
 import com.backend.tms.repository.AssignmentRepository;
 import com.backend.tms.repository.SubmitAssignmentRepository;
 import com.backend.tms.repository.TraineeRepository;
 import com.backend.tms.service.SubmitAssignmentService;
+import com.backend.tms.utlis.AppConstants;
+import com.backend.tms.utlis.FileService;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.FileUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -33,9 +41,6 @@ public class SubmitAssignmentServiceImp implements SubmitAssignmentService {
     private final TraineeRepository traineeRepository;
     private final ModelMapper modelMapper;
 
-    private static final String UPLOAD_DIR = "D:\\TMS FILE";
-    private static final String DOWNLOAD_DIR = "D:\\TMS FILE DOWNLOAD";
-
     @Override
     public ResponseEntity<Object> submitAssignment(Long assignmentId, SubmitAssignmentReqModel submitAssignmentModel) {
         try {
@@ -47,10 +52,10 @@ public class SubmitAssignmentServiceImp implements SubmitAssignmentService {
 
             MultipartFile file = submitAssignmentModel.getFile();
             if (file.isEmpty()) {
-                return ResponseEntity.badRequest().body("No file selected.");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No file is selected");
             }
-            String fileUrl = uploadFile(file);
-            if (fileUrl == null) {
+            String fileUrl =  FileService.uploadFile(file, AppConstants.SUBMIT_ASSIGNMENT_UPLOAD_DIR );
+            if (fileUrl == null ) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload the file");
             }
 
@@ -64,35 +69,10 @@ public class SubmitAssignmentServiceImp implements SubmitAssignmentService {
             Date currentTime = new Date();
             subAssignmentEntity.setCreatedTime(currentTime);
             subAssignmentEntity.setTraineeName(trainee.getFullName());
-
-            // Fetch the assignment deadline from the AssignmentEntity
             Date deadline = assignment.get().getDeadline();
 
-            String submissionStatus;
-            // Compare the deadline with the current time
-            if (currentTime.after(deadline)) {
-                // If current time is after the deadline, set the submission status as delayed
-                long delayInMillis = currentTime.getTime() - deadline.getTime();
-                long delayInMinutes = TimeUnit.MILLISECONDS.toMinutes(delayInMillis);
-                long delayInHours = TimeUnit.MILLISECONDS.toHours(delayInMillis);
-                long delayInDays = TimeUnit.MILLISECONDS.toDays(delayInMillis);
-
-                // Set the delayed status message based on the time difference
-                String delayedStatus = "Delayed ";
-                if (delayInDays > 0) {
-                    delayedStatus += delayInDays + " days";
-                } else if (delayInHours > 0) {
-                    delayedStatus += delayInHours + " hours";
-                } else {
-                    delayedStatus += delayInMinutes + " minutes";
-                }
-
-                subAssignmentEntity.setSubmittedStatus(delayedStatus);
-            } else {
-                // If current time is on or before the deadline, set the submission status as in-time
-                subAssignmentEntity.setSubmittedStatus("In-time");
-            }
-
+            // Calculate the submission status based on the deadline and current time
+            subAssignmentEntity.setSubmittedStatus(calculateSubmissionStatus(currentTime, deadline));
             submitAssignmentRepository.save(subAssignmentEntity);
 
             // Update the relationship between AssignmentEntity and SubmitAssignmentEntity
@@ -113,13 +93,12 @@ public class SubmitAssignmentServiceImp implements SubmitAssignmentService {
         try {
             MultipartFile file = submitAssignmentModel.getFile();
             if (file.isEmpty()) {
-                return ResponseEntity.badRequest().body("No file selected.");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No file is selected");
             }
-            String fileUrl = uploadFile(file);
+            String fileUrl =  FileService.uploadFile(file, AppConstants.ASSIGNMENT_UPLOAD_DIR );
             if (fileUrl == null) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload the file");
             }
-
 
             // Retrieve the existing submitted assignment
             Optional<SubmitAssignmentEntity> submittedAssignment = submitAssignmentRepository.findById(subAssignmentId);
@@ -139,26 +118,52 @@ public class SubmitAssignmentServiceImp implements SubmitAssignmentService {
     }
 
     @Override
-    public ResponseEntity<Object> downloadAssignment(Long assignmentId) {
-        return null;
-    }
+    public ResponseEntity<Object> downloadSubAssignment(Long subAssignmentId) {
+        SubmitAssignmentEntity subAssignmentEntity = submitAssignmentRepository.findById(subAssignmentId).orElseThrow(() -> new SubmittedAssignmentNotFound("submitted Assignment not found with ID: " + subAssignmentId));
+        if(subAssignmentEntity.getSubmitFileUrl()==null){throw new FileNotFoundException("File not found for download");}
 
-    private String uploadFile(MultipartFile file) {
-        if (file != null && !file.isEmpty()) {
-            try {
-                String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-                File destinationDir = new File(UPLOAD_DIR);
-                if (!destinationDir.exists()) {
-                    destinationDir.mkdirs(); // Create the directory if it doesn't exist
-                }
-                File destinationFile = new File(destinationDir, fileName);
-                file.transferTo(destinationFile);
-                return destinationFile.getAbsolutePath();
-            } catch (IOException e) {
-                e.printStackTrace();
+        try{
+            File file = new File(subAssignmentEntity.getSubmitFileUrl());
+            String fileContents = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
+
+            // Create a new file in the specified directory
+            String fileName = StringUtils.cleanPath(file.getName());
+            File destinationDir = new File(AppConstants.SUBMIT_ASSIGNMENT_DOWNLOAD_DIR);
+            if (!destinationDir.exists()) {
+                destinationDir.mkdirs(); // Create the directory if it doesn't exist
             }
+            File destinationFile = new File(destinationDir, fileName);
+            FileUtils.writeStringToFile(destinationFile, fileContents, StandardCharsets.UTF_8);
+            String message = "Download successful. File saved to: " + destinationFile.getAbsolutePath();
+            return ResponseEntity.ok(message);
+        }catch(Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to read or save the file");
         }
-        return null;
     }
 
-}
+
+    private String calculateSubmissionStatus(Date currentTime, Date deadline) {
+        if (currentTime.after(deadline)) {
+            long delayInMillis = currentTime.getTime() - deadline.getTime();
+            long delayInMinutes = TimeUnit.MILLISECONDS.toMinutes(delayInMillis);
+            long delayInHours = TimeUnit.MILLISECONDS.toHours(delayInMillis);
+            long delayInDays = TimeUnit.MILLISECONDS.toDays(delayInMillis);
+
+            // Set the delayed status message based on the time difference
+            String delayedStatus = "Delayed ";
+            if (delayInDays > 0) {
+                delayedStatus += delayInDays + " days";
+            } else if (delayInHours > 0) {
+                delayedStatus += delayInHours + " hours";
+            } else {
+                delayedStatus += delayInMinutes + " minutes";
+            }
+
+            return delayedStatus;
+        } else {
+            // If current time is on or before the deadline, set the submission status as in-time
+            return "In-time";
+        }
+    }
+
+    }

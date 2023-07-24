@@ -29,9 +29,9 @@ public class SubmitAssignmentController {
         return submitAssignmentService.updateAssignment(subAssignmentId, submitAssignmentModel);
     }
 
-    @GetMapping("/{assignmentId}/download")
+    @GetMapping("/{subAssignmentId}/download")
     @PreAuthorize("hasRole('TRAINER') or hasRole('TRAINEE')")
-    public ResponseEntity<Object> downloadAssignment(@PathVariable("assignmentId") Long assignmentId) {
-        return submitAssignmentService.downloadAssignment(assignmentId);
+    public ResponseEntity<Object> downloadSubAssignment(@PathVariable("subAssignmentId") Long subAssignmentId) {
+        return submitAssignmentService.downloadSubAssignment(subAssignmentId);
     }
 }
