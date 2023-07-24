@@ -10,6 +10,7 @@ import com.backend.tms.model.Batch.BatchResModel;
 import com.backend.tms.repository.BatchRepository;
 import com.backend.tms.repository.ClassroomRepository;
 import com.backend.tms.service.BatchService;
+import com.backend.tms.utlis.ValidationUtlis;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -29,28 +30,34 @@ public class BatchServiceImp implements BatchService {
     private final ClassroomRepository classroomRepository;
     @Override
     public ResponseEntity<Object> createBatch(BatchReqModel batchModel) {
-        // Check if a batch with the same name already exists
         String batchName = batchModel.getBatchName();
         //matching the pattern of the batch name
         String pattern = "^YSD_B\\d{2}_\\w+$";
         if (!batchName.matches(pattern)) {
            throw new IllegalArgumentException("Batch Name is not following the format");
         }
+
+        //find if the batch exist of not.
         BatchEntity existingBatch = batchRepository.findByBatchName(batchName);
         if (existingBatch != null) {
-            throw  new BatchAlreadyExistsException("Batch already exist with the same Name!");
+            throw new BatchAlreadyExistsException("Batch already exist with the same Name!");
         }
-        // Create a new BatchEntity
+
+        //duration of a batch validation
+        if (ValidationUtlis.isBatchDurationValid(batchModel)) {
+            throw new IllegalArgumentException("Batch duration should be 4 months.");
+        }
+
         BatchEntity batchEntity = modelMapper.map(batchModel,BatchEntity.class);
         // Add classroom for the batch
         ClassroomEntity classroomEntity = ClassroomEntity.builder()
                 .id(batchEntity.getId())
                 .className(batchEntity.getBatchName())
                 .build();
+
         classroomRepository.save(classroomEntity);
         batchEntity.setClassroom(classroomEntity);;
         batchRepository.save(batchEntity);
-        // If the save operation is successful, return a success message
         return new ResponseEntity<>("Batch added successfully", HttpStatus.CREATED);
     }
 
@@ -82,7 +89,6 @@ public class BatchServiceImp implements BatchService {
         return new ResponseEntity<>(batchesResponse, HttpStatus.OK);
     }
 
-
     @Override
     public ResponseEntity<Object> getAllBatchName() {
         List<BatchEntity> batchEntities = batchRepository.findAll();
@@ -103,16 +109,20 @@ public class BatchServiceImp implements BatchService {
 
     @Override
     public ResponseEntity<Object> updateBatch(Long batchId, BatchReqModel batchModel) {
-        // Check if the batch exists
         BatchEntity batchEntity = batchRepository.findById(batchId)
                 .orElseThrow(() -> new BatchNotFoundException("Batch not found"));
+
+        //duration of a batch validation
+        if (ValidationUtlis.isBatchDurationValid(batchModel)) {
+            throw new IllegalArgumentException("Batch duration should be 4 months.");
+        }
+
         // Update the batch details
         batchEntity.setBatchName(batchModel.getBatchName());
         batchEntity.setStartDate(batchModel.getStartDate());
         batchEntity.setEndDate(batchModel.getEndDate());
         // Save the updated batch entity
         batchRepository.save(batchEntity);
-        // Return a success message
         return new ResponseEntity<>("Batch updated successfully", HttpStatus.OK);
     }
 
