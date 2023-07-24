@@ -2,7 +2,6 @@ package com.backend.tms.service.Impl;
 
 import com.backend.tms.entity.ClassroomEntity;
 import com.backend.tms.entity.NoticeEntity;
-import com.backend.tms.entity.PostEntity;
 import com.backend.tms.entity.TrainerEntity;
 import com.backend.tms.exception.custom.*;
 import com.backend.tms.model.Classroom.NoticeReqModel;
@@ -69,8 +68,6 @@ public class NoticeServiceImp implements NoticeService {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to create Notice");
         }
     }
-
-
 
     @Override
     public ResponseEntity<Object> getNotice(Long noticeId) {
