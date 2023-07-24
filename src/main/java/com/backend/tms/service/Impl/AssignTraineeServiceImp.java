@@ -2,10 +2,8 @@ package com.backend.tms.service.Impl;
 
 import com.backend.tms.entity.BatchEntity;
 import com.backend.tms.entity.TraineeEntity;
-import com.backend.tms.entity.TrainerEntity;
 import com.backend.tms.exception.custom.BatchNotFoundException;
 import com.backend.tms.exception.custom.TraineeNotFoundException;
-import com.backend.tms.exception.custom.TrainerNotFoundException;
 import com.backend.tms.model.Trainee.AddTraineeReqModel;
 import com.backend.tms.repository.BatchRepository;
 import com.backend.tms.repository.TraineeRepository;
@@ -16,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Service
@@ -28,18 +25,19 @@ public class AssignTraineeServiceImp implements AssignTraineeService {
 
     @Override
     public ResponseEntity<Object> addTraineesToBatch(AddTraineeReqModel requestModel) {
-        BatchEntity batch = batchRepository.findById(requestModel.getBatchId()).orElseThrow(() -> new BatchNotFoundException("Batch not found"));
+        BatchEntity batch = batchRepository.findById(requestModel.getBatchId()).orElseThrow(() ->
+                new BatchNotFoundException("Batch not found"));
 
-
+        //get all the trainees
         Set<TraineeEntity> trainee = new HashSet<>(traineeRepository.findAllById(requestModel.getTraineeIds()));
         if (trainee.size() == 0) {
             throw new TraineeNotFoundException("No trainee found for the provided IDs");
         }
 
+        //add the trainee to the batch
             batch.getTrainees().addAll(trainee);
             batchRepository.save(batch);
-        // Return a success message
-        return new ResponseEntity<>("Assign Trainees successfully", HttpStatus.OK);
 
+        return new ResponseEntity<>("Assign Trainees successfully", HttpStatus.OK);
     }
 }

@@ -16,7 +16,7 @@ public class AssignTraineeController {
     private final AssignTraineeService assignTraineeService;
 
     @PostMapping()
-    @PreAuthorize(" hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Object> addTraineesToBatch(@RequestBody AddTraineeReqModel requestModel) {
         return assignTraineeService.addTraineesToBatch(requestModel);
     }
