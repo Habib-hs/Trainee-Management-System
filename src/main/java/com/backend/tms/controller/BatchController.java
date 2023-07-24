@@ -1,10 +1,8 @@
 package com.backend.tms.controller;
 
-
 import com.backend.tms.model.Batch.BatchReqModel;
 import com.backend.tms.service.BatchService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +17,6 @@ public class BatchController {
     public ResponseEntity<Object> createBatch(@RequestBody BatchReqModel batchModel) {
         return batchService.createBatch(batchModel);
     }
-
     @GetMapping("/get/all")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Object> getAllBatches() {
@@ -43,7 +40,6 @@ public class BatchController {
     public ResponseEntity<Object> updateBatch(@PathVariable("id") Long batchId, @RequestBody BatchReqModel batchModel) {
         return batchService.updateBatch(batchId, batchModel);
     }
-
     @DeleteMapping("/delete/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Object> deleteBatch(@PathVariable("id") Long batchId) {
