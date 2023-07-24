@@ -15,30 +15,30 @@ import org.springframework.web.bind.annotation.*;
 public class NoticeController {
     private final NoticeService noticeService;
     @PostMapping()
-    @PreAuthorize("hasRole('TRAINER')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('TRAINER')")
     public ResponseEntity<Object> createNotice(@ModelAttribute NoticeReqModel noticeModel) {
         return noticeService.createNotice(noticeModel);
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('TRAINER') or hasRole('TRAINEE')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('TRAINER') or hasRole('TRAINEE')")
     public ResponseEntity<Object> getNotice(@PathVariable("id") Long noticeId) {
         return noticeService.getNotice(noticeId);
     }
 
     @PutMapping("/update/{id}")
-    @PreAuthorize("hasRole('TRAINER')")
+    @PreAuthorize("hasRole('TRAINER') or hasRole('ADMIN")
     public ResponseEntity<Object> updateNotice(@PathVariable("id") Long noticeId, @ModelAttribute NoticeReqModel noticeModel) {
         return noticeService.updateNotice(noticeId, noticeModel);
     }
     @GetMapping("/{id}/download")
-    @PreAuthorize("hasRole('TRAINER') or hasRole('TRAINEE')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('TRAINER') or hasRole('TRAINEE')")
     public ResponseEntity<Object> downloadNoticeFile(@PathVariable("id") Long noticeId) {
         return noticeService.downloadNoticeFile(noticeId);
     }
 
     @GetMapping("/classroom/{id}")
-    @PreAuthorize("hasRole('TRAINER')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('TRAINER')")
     public ResponseEntity<Object> getAllNoticeByClassroomId(@PathVariable("id") Long classroomId) {
         return noticeService.getAllNoticeByClassroomId(classroomId);
     }
