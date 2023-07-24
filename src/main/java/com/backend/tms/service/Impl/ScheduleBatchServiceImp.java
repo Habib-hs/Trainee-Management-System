@@ -12,6 +12,7 @@ import com.backend.tms.repository.CourseRepository;
 import com.backend.tms.repository.ScheduleRepository;
 import com.backend.tms.repository.TrainerRepository;
 import com.backend.tms.service.ScheduleBatchService;
+import com.backend.tms.utlis.ValidationUtlis;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,19 +39,22 @@ public class ScheduleBatchServiceImp implements ScheduleBatchService {
             throw new CourseAlreadyExistsException("The course is already Scheduled!");
         }
 
+         if(ValidationUtlis.isBatchDurationValid(scheduleBatchModel.getStartDate(), scheduleBatchModel.getEndDate())){
+             return new ResponseEntity<>("The Time range should not longer than 4 month", HttpStatus.BAD_REQUEST);
+         }
+
+         if(ValidationUtlis.isDateRangeValid(scheduleBatchModel.getStartDate(), scheduleBatchModel.getEndDate())){
+             return new ResponseEntity<>("Ending Date can't same or less than Starting Date", HttpStatus.BAD_REQUEST);
+         }
+
+       //separate validation for Common & Domain Specific Course
         if (scheduleBatchModel.getCourseType().equals("Common")) {
-            if (!isCommonCourseTimeValid(scheduleBatchModel)) {
-                return new ResponseEntity<>("Invalid time schedule for common course", HttpStatus.BAD_REQUEST);
-            }
-            if (hasCommonCourseConflicts(scheduleBatchModel)) {
+            if (ValidationUtlis.hasCommonCourseConflicts(scheduleBatchModel, scheduleRepository)) {
                 return new ResponseEntity<>("The course overlaps with an existing common course", HttpStatus.BAD_REQUEST);
             }
         } else {
-            if (!isDomainCourseTimeValid(scheduleBatchModel)) {
-                return new ResponseEntity<>("Invalid time schedule for domain course", HttpStatus.BAD_REQUEST);
-            }
-            if (hasDomainCourseConflicts(scheduleBatchModel)) {
-                return new ResponseEntity<>("The course overlaps with an existing course for some batch", HttpStatus.BAD_REQUEST);
+            if (ValidationUtlis.hasDomainCourseConflicts(scheduleBatchModel, batchRepository)) {
+                return new ResponseEntity<>("The course overlaps with an existing course for the same batch", HttpStatus.BAD_REQUEST);
             }
         }
 
@@ -96,94 +100,41 @@ public class ScheduleBatchServiceImp implements ScheduleBatchService {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-
-    private boolean isCommonCourseTimeValid(ScheduleBatchReqModel scheduleBatchModel) {
-        LocalDateTime startDate = scheduleBatchModel.getStartDate().toLocalDateTime();
-        LocalDateTime endDate = scheduleBatchModel.getEndDate().toLocalDateTime();
-
-        return startDate.isBefore(endDate) && !startDate.plusMonths(4).isBefore(endDate);
-    }
-
-    private boolean isDomainCourseTimeValid(ScheduleBatchReqModel scheduleBatchModel) {
-        LocalDateTime startDate = scheduleBatchModel.getStartDate().toLocalDateTime();
-        LocalDateTime endDate = scheduleBatchModel.getEndDate().toLocalDateTime();
-
-        return startDate.isBefore(endDate);
-    }
-
-    private boolean hasCommonCourseConflicts(ScheduleBatchReqModel scheduleBatchModel) {
-        LocalDateTime startDate = scheduleBatchModel.getStartDate().toLocalDateTime();
-        LocalDateTime endDate = scheduleBatchModel.getEndDate().toLocalDateTime();
-
-        List<ScheduleBatchEntity> existingSchedules = scheduleRepository.findByCourseType("Common");
-        for (ScheduleBatchEntity existingSchedule : existingSchedules) {
-            if (isOverlapping(startDate, endDate, existingSchedule.getStartDate(), existingSchedule.getEndDate())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean hasDomainCourseConflicts(ScheduleBatchReqModel scheduleBatchModel) {
-        LocalDateTime startDate = scheduleBatchModel.getStartDate().toLocalDateTime();
-        LocalDateTime endDate = scheduleBatchModel.getEndDate().toLocalDateTime();
-
-        List<Long> batchIds = scheduleBatchModel.getBatchesIds();
-        for (Long batchId : batchIds) {
-            BatchEntity batch = batchRepository.findById(batchId)
-                    .orElseThrow(() -> new BatchNotFoundException("Batch not found with ID: " + batchId));
-
-            for (ScheduleBatchEntity existingSchedule : batch.getSchedulePrograms()) {
-                if (existingSchedule.getCourseType().equals("Common")) {
-                    continue; // Skip common course schedules
-                }
-
-                if (isOverlapping(startDate, endDate, existingSchedule.getStartDate(), existingSchedule.getEndDate())) {
-                    return true; // Conflict with domain-specific course
-                }
-            }
-        }
-
-        return false;
-    }
-
-    private boolean isOverlapping(LocalDateTime start1, LocalDateTime end1, LocalDateTime start2, LocalDateTime end2) {
-        return start1.isBefore(end2) && start2.isBefore(end1);
-    }
-
     private ScheduleBatchEntity mapToScheduleBatchEntity(ScheduleBatchReqModel scheduleBatchModel) {
         ScheduleBatchEntity scheduleBatchEntity = new ScheduleBatchEntity();
         scheduleBatchEntity.setCourseName(scheduleBatchModel.getCourseName());
         scheduleBatchEntity.setCourseType(scheduleBatchModel.getCourseType());
-        scheduleBatchEntity.setStartDate(scheduleBatchModel.getStartDate().toLocalDateTime());
-        scheduleBatchEntity.setEndDate(scheduleBatchModel.getEndDate().toLocalDateTime());
+        scheduleBatchEntity.setStartDate(scheduleBatchModel.getStartDate());
+        scheduleBatchEntity.setEndDate(scheduleBatchModel.getEndDate());
 
-        String courseIdString = scheduleBatchModel.getCourseId();
-        Long courseId = Long.parseLong(courseIdString);
-        Optional<CourseEntity> courseEntityOptional = courseRepository.findById(courseId);
-
-        if (courseEntityOptional.isPresent()) {
-            CourseEntity courseEntity = courseEntityOptional.get();
-            scheduleBatchEntity.setCourse(courseEntity);
+        String courseType = scheduleBatchModel.getCourseType();
+        if ("Common".equals(courseType)) {
+            mapCommonOrDomainCourse(scheduleBatchEntity, true, null);
+        } else {
+            mapCommonOrDomainCourse(scheduleBatchEntity, false, scheduleBatchModel);
         }
 
+        return scheduleBatchEntity;
+    }
 
-        List<Long> batchIds = scheduleBatchModel.getBatchesIds();
+    private void mapCommonOrDomainCourse(ScheduleBatchEntity scheduleBatchEntity, boolean isCommon, ScheduleBatchReqModel scheduleBatchModel) {
         Set<BatchEntity> batchEntities = new HashSet<>();
 
-        if (scheduleBatchModel.getCourseType().equals("Common")){
+        if (isCommon) {
             List<BatchEntity> batchEntityList = batchRepository.findAll();
-            // System.out.println(batchEntityList.size());
-            batchEntities = new HashSet<>(batchEntityList);
-            scheduleBatchEntity.setBatches(batchEntities);
-        }else{
+            batchEntities.addAll(batchEntityList);
+        } else {
+            List<Long> batchIds = scheduleBatchModel.getBatchesIds();
             for (Long batchId : batchIds) {
                 BatchEntity batch = batchRepository.findById(batchId)
                         .orElseThrow(() -> new BatchNotFoundException("Batch not found with ID: " + batchId));
                 batchEntities.add(batch);
-                scheduleBatchEntity.setBatches(batchEntities);
             }
         }
-        return scheduleBatchEntity;
+
+        scheduleBatchEntity.setBatches(batchEntities);
     }
+
+
+
 }
