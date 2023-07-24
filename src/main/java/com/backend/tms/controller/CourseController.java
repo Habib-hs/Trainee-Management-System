@@ -3,12 +3,9 @@ package com.backend.tms.controller;
 import com.backend.tms.model.Course.CourseReqModel;
 import com.backend.tms.service.CourseService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
 
 @RestController
 @RequestMapping("/course")
@@ -35,13 +32,13 @@ public class CourseController {
         return courseService.updateCourse(courseId, courseModel);
     }
 
-    @GetMapping("/all")
+    @GetMapping("/get/all")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Object> getAllCourses() {
         return courseService.getAllCourses();
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/get/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Object> getCourseById(@PathVariable("id") Long courseId) {
         return courseService.getCourseById(courseId);
