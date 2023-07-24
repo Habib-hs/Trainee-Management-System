@@ -23,7 +23,6 @@ public class AssignTrainerServiceImp implements AssignTrainerService {
     private final TrainerRepository trainerRepository;
     @Override
     public ResponseEntity<Object> addTrainerToBatch(AddTrainerReqModel requestModel) {
-
         //if batch not found
             BatchEntity batchEntity = batchRepository.findById(requestModel.getBatchId())
                     .orElseThrow(() -> new BatchNotFoundException("Batch not found"));
@@ -35,7 +34,6 @@ public class AssignTrainerServiceImp implements AssignTrainerService {
         batchEntity.getTrainers().addAll(trainers);
         batchRepository.save(batchEntity);
 
-        // Return a success message
         return new ResponseEntity<>("Assign Trainer successfully", HttpStatus.OK);
     }
 }
