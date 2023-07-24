@@ -12,6 +12,8 @@ import com.backend.tms.repository.AssignmentRepository;
 import com.backend.tms.repository.ScheduleRepository;
 import com.backend.tms.repository.TrainerRepository;
 import com.backend.tms.service.AssignmentService;
+import com.backend.tms.utlis.AppConstants;
+import com.backend.tms.utlis.FileService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FileUtils;
 import org.modelmapper.ModelMapper;
@@ -34,15 +36,14 @@ public class AssignmentServiceImp implements AssignmentService {
     private final ScheduleRepository scheduleRepository;
     private final TrainerRepository trainerRepository;
     private final ModelMapper modelMapper;
-    private static final String UPLOAD_DIR = "D:\\TMS FILE";
-    private static final String DOWNLOAD_DIR = "D:\\TMS FILE DOWNLOAD";
+
 
     public ResponseEntity<Object> createAssignment(AssignmentReqModel assignmentModel) {
         try {
             MultipartFile file = assignmentModel.getFile();
             String fileUrl = null;
             if (file != null && !file.isEmpty()) {
-                fileUrl = uploadFile(file);
+                fileUrl = FileService.uploadFile(file, AppConstants.ASSIGNMENT_UPLOAD_DIR );
             }
             AssignmentEntity assignmentEntity = modelMapper.map(assignmentModel, AssignmentEntity.class);
             if (fileUrl != null) {
@@ -71,7 +72,7 @@ public class AssignmentServiceImp implements AssignmentService {
 
             MultipartFile file = assignmentModel.getFile();
             if (file != null && !file.isEmpty()) {
-                String fileUrl = uploadFile(file);
+                String fileUrl = AppConstants.ASSIGNMENT_UPLOAD_DIR ;
                 if (fileUrl == null) {
                     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload the file");
                 }
@@ -114,7 +115,7 @@ public class AssignmentServiceImp implements AssignmentService {
 
             // Create a new file in the specified directory
             String fileName = StringUtils.cleanPath(file.getName());
-            File destinationDir = new File(DOWNLOAD_DIR);
+            File destinationDir = new File(AppConstants.ASSIGNMENT_DOWNLOAD_DIR);
             if (!destinationDir.exists()) {
                 destinationDir.mkdirs(); // Create the directory if it doesn't exist
             }
@@ -181,6 +182,7 @@ public class AssignmentServiceImp implements AssignmentService {
             assignmentMap.put("deadline", assignmentEntity.getDeadline());
             assignmentMap.put("description", assignmentEntity.getDescription());
             assignmentMap.put("fileUrl", assignmentEntity.getFileUrl());
+
             // Fetch the scheduleEntity from the scheduleRepository using the scheduleId
             ScheduleBatchEntity scheduleEntity = scheduleRepository.findById(assignmentEntity.getScheduleId())
                     .orElseThrow(() -> new ScheduleNotFoundException("Schedule not found for assignment with ID: " + assignmentEntity.getId()));
@@ -202,26 +204,9 @@ public class AssignmentServiceImp implements AssignmentService {
         assignmentEntity.setName(assignmentModel.getName());
         assignmentEntity.setType(assignmentModel.getType());
         assignmentEntity.setDeadline(assignmentModel.getDeadline());
-        // Update other assignment attributes as needed
     }
 
-    private String uploadFile(MultipartFile file) {
-        if (file != null && !file.isEmpty()) {
-            try {
-                String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-                File destinationDir = new File(UPLOAD_DIR);
-                if (!destinationDir.exists()) {
-                    destinationDir.mkdirs(); // Create the directory if it doesn't exist
-                }
-                File destinationFile = new File(destinationDir, fileName);
-                file.transferTo(destinationFile);
-                return destinationFile.getAbsolutePath();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return null;
-    }
+
 
 
 }

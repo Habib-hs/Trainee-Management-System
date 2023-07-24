@@ -28,7 +28,7 @@ public class AssignmentController {
         return assignmentService.getAssignment(assignmentId);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
     @PreAuthorize("hasRole('TRAINER')")
     public ResponseEntity<Object> updateAssignment(@PathVariable("id") Long assignmentId, @ModelAttribute AssignmentReqModel assignmentModel) {
         return assignmentService.updateAssignment(assignmentId, assignmentModel);

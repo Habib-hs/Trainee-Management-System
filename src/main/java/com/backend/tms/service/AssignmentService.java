@@ -3,7 +3,6 @@ package com.backend.tms.service;
 
 import com.backend.tms.model.Classroom.AssignmentReqModel;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.multipart.MultipartFile;
 
 public interface AssignmentService {
     ResponseEntity<Object> createAssignment(AssignmentReqModel assignmentModel);
