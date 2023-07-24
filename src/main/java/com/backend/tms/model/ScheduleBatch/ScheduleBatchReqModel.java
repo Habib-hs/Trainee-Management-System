@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 
@@ -18,8 +18,8 @@ public class ScheduleBatchReqModel {
     private Long id;
     private String courseName;
     private String courseType;
-    private Timestamp startDate;
-    private Timestamp endDate;
+    private Date startDate;
+    private Date endDate;
     private String courseId;
     private List<Long> batchesIds;
 

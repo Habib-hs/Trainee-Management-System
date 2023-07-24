@@ -7,7 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -24,29 +24,13 @@ public class ScheduleBatchEntity {
     private Long id;
     private String courseName;
     private String courseType;
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
+    private Date startDate;
+    private Date endDate;
 
     //relation with course
     @OneToOne
     private CourseEntity course;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ScheduleBatchEntity that = (ScheduleBatchEntity) o;
-        return Objects.equals(id, that.id) &&
-                Objects.equals(courseName, that.courseName) &&
-                Objects.equals(courseType, that.courseType) &&
-                Objects.equals(startDate, that.startDate) &&
-                Objects.equals(endDate, that.endDate);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, courseName, courseType, startDate, endDate);
-    }
 
     //relation with batch
     @Builder.Default
@@ -65,5 +49,21 @@ public class ScheduleBatchEntity {
     @JsonIgnore
     private Set<AssignmentEntity> assignments = new HashSet<>();
 
-    // Constructors, getters, and setters can be added here
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ScheduleBatchEntity that = (ScheduleBatchEntity) o;
+        return Objects.equals(id, that.id) &&
+                Objects.equals(courseName, that.courseName) &&
+                Objects.equals(courseType, that.courseType) &&
+                Objects.equals(startDate, that.startDate) &&
+                Objects.equals(endDate, that.endDate);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, courseName, courseType, startDate, endDate);
+    }
+
 }
