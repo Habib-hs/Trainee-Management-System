@@ -19,11 +19,11 @@ public class ValidationUtlis {
         long durationInDays = TimeUnit.MILLISECONDS.toDays(endDate.getTime() - startDate.getTime());
 
         // Check if the duration is between 90 days (3 months) and 124 days (4 months)
-        return durationInDays >=90 && durationInDays <= 122;
+        return durationInDays >=118 && durationInDays <= 122;
     }
 
     public static boolean isDateRangeValid(Date startDate, Date endDate) {
-        return startDate.before(endDate) || startDate.equals(endDate);
+        return endDate.before(startDate) || startDate.equals(endDate);
     }
 
     public static boolean hasCommonCourseConflicts(ScheduleBatchReqModel scheduleBatchModel, ScheduleRepository scheduleRepository) {
