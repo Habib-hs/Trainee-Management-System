@@ -115,7 +115,7 @@ public class ScheduleBatchServiceImp implements ScheduleBatchService {
         LocalDateTime startDate = scheduleBatchModel.getStartDate().toLocalDateTime();
         LocalDateTime endDate = scheduleBatchModel.getEndDate().toLocalDateTime();
 
-        List<ScheduleBatchEntity> existingSchedules = scheduleRepository.findByCourseType("common");
+        List<ScheduleBatchEntity> existingSchedules = scheduleRepository.findByCourseType("Common");
         for (ScheduleBatchEntity existingSchedule : existingSchedules) {
             if (isOverlapping(startDate, endDate, existingSchedule.getStartDate(), existingSchedule.getEndDate())) {
                 return true;

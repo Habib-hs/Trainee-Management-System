@@ -38,8 +38,13 @@ public class SubmitAssignmentServiceImp implements SubmitAssignmentService {
 
     @Override
     public ResponseEntity<Object> submitAssignment(Long assignmentId, SubmitAssignmentReqModel submitAssignmentModel) {
-
         try {
+
+            Optional<AssignmentEntity> assignment = assignmentRepository.findById(assignmentId);
+            if(!assignment.isPresent()){
+                throw new AssignmentNotFoundException("Assignment Not Found!");
+            }
+
             MultipartFile file = submitAssignmentModel.getFile();
             if (file.isEmpty()) {
                 return ResponseEntity.badRequest().body("No file selected.");
@@ -60,16 +65,10 @@ public class SubmitAssignmentServiceImp implements SubmitAssignmentService {
             subAssignmentEntity.setCreatedTime(currentTime);
             subAssignmentEntity.setTraineeName(trainee.getFullName());
 
-            // Update the assignment with the submission details
-            Optional<AssignmentEntity> assignment = assignmentRepository.findById(assignmentId);
-            if(!assignment.isPresent()){
-                throw new AssignmentNotFoundException("Assignment Not Found!");
-            }
-
             // Fetch the assignment deadline from the AssignmentEntity
             Date deadline = assignment.get().getDeadline();
 
-
+            String submissionStatus;
             // Compare the deadline with the current time
             if (currentTime.after(deadline)) {
                 // If current time is after the deadline, set the submission status as delayed

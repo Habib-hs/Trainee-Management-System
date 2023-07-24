@@ -50,5 +50,4 @@ public class PostController {
         return postService.getAllPostsByClassroom(classroomId);
     }
 
-
 }

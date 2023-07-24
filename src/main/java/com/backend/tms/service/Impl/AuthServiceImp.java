@@ -8,7 +8,6 @@ import com.backend.tms.exception.custom.AdminAlreadyExistException;
 import com.backend.tms.exception.custom.TraineeAlreadyExistsException;
 import com.backend.tms.exception.custom.TrainerAlreadyExistException;
 import com.backend.tms.model.Admin.AdminReqModel;
-import com.backend.tms.model.Admin.AdminResModel;
 import com.backend.tms.model.Common.AuthenticationReqModel;
 import com.backend.tms.model.Common.AuthenticationResModel;
 import com.backend.tms.model.Trainee.TraineeReqModel;
@@ -43,12 +42,10 @@ public class AuthServiceImp implements AuthService {
 
     @Override
     public ResponseEntity<Object> registerAdmin(AdminReqModel adminModel) {
-
         UserEntity userEntityByEmail = userRepository.findByEmail(adminModel.getEmail());
         if (userEntityByEmail != null) {
             throw new AdminAlreadyExistException("User already exists with the given email");
         }
-
         // Create a new UserEntity
         UserEntity userEntity = UserEntity.builder()
                 .id(adminModel.getId()) // Set the ID explicitly
@@ -56,21 +53,17 @@ public class AuthServiceImp implements AuthService {
                 .password(passwordEncoder.encode(adminModel.getPassword()))
                 .role("ADMIN")
                 .build();
-
-        // Save the UserEntity to generate the ID
         UserEntity newUser = userRepository.save(userEntity);
 
         //mapping the admin
         AdminEntity admin = modelMapper.map(adminModel, AdminEntity.class);
-        admin.setUser(newUser); // Set the UserEntity as the associated user
-        // Save the AdminEntity
+        admin.setUser(newUser);
         adminRepository.save(admin);
-        return new ResponseEntity<>("admin created successfully", HttpStatus.OK);
+        return new ResponseEntity<>("admin created successfully", HttpStatus.CREATED);
     }
 
     @Override
     public ResponseEntity<Object> registerTrainee(TraineeReqModel traineeModel) {
-
         UserEntity userEntityByEmail = userRepository.findByEmail(traineeModel.getEmail());
         if (userEntityByEmail != null) {
             throw new TraineeAlreadyExistsException("User already exists with the given email");
@@ -82,28 +75,23 @@ public class AuthServiceImp implements AuthService {
                 .password(passwordEncoder.encode(traineeModel.getPassword()))
                 .role("TRAINEE")
                 .build();
-
-        // Save the UserEntity to generate the ID
         UserEntity newUser = userRepository.save(userTrainee);
 
         // Map TraineeReqModel to TraineeEntity
         TraineeEntity trainee = modelMapper.map(traineeModel, TraineeEntity.class);
         trainee.setUser(newUser);
         traineeRepository.save(trainee);
-        //add trainee Id on the User table
+        //add trainee ID on the User table
         newUser.setRoleBasedId(trainee.getId());
         userRepository.save(newUser);
-        return new ResponseEntity<>("Trainee Created Successfully", HttpStatus.OK);
+        return new ResponseEntity<>("Trainee Created Successfully", HttpStatus.CREATED);
     }
 
     @Override
     public ResponseEntity<Object> registerTrainer(TrainerReqModel trainerModel) {
-
-        // Check if the trainer with the given email already exists
         if (userRepository.findByEmail(trainerModel.getEmail()) != null) {
             throw new TrainerAlreadyExistException("User already exists with the given email");
         }
-
         // Create a new UserEntity
         UserEntity userEntity = UserEntity.builder()
                 .id(trainerModel.getId()) // Set the ID explicitly
@@ -111,8 +99,6 @@ public class AuthServiceImp implements AuthService {
                 .password(passwordEncoder.encode(trainerModel.getPassword()))
                 .role("TRAINER")
                 .build();
-
-        // Save the UserEntity to generate the ID
         UserEntity newUser = userRepository.save(userEntity);
 
         // Map TrainerReqModel to TrainerEntity
@@ -122,7 +108,7 @@ public class AuthServiceImp implements AuthService {
         //add the trainerId
         newUser.setRoleBasedId(trainer.getId());
         userRepository.save(newUser);
-        return new ResponseEntity<>("trainer created successfully", HttpStatus.OK);
+        return new ResponseEntity<>("trainer created successfully", HttpStatus.CREATED);
 
     }
 
