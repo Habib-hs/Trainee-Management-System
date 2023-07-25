@@ -19,4 +19,6 @@ public class PostResModel {
     private Long classroomId;
     private Long trainerId;
     private MultipartFile file;
+    private String senderName;
+
 }

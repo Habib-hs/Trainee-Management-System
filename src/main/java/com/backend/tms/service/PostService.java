@@ -10,8 +10,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface PostService {
     ResponseEntity<Object> createPost(PostReqModel postModel);
     ResponseEntity<Object> getPost(Long postId);
+     ResponseEntity<Object> getAllPosts();
     ResponseEntity<Object> updatePost(Long postId, PostReqModel postModel);
     ResponseEntity<Object> downloadPostFile(Long postId);
-    public ResponseEntity<Object> getAllPostsByClassroom(Long classroomId);
+     ResponseEntity<Object> getAllPostsByClassroom(Long classroomId);
 
 }

@@ -20,6 +20,12 @@ public class PostController {
         return postService.createPost(postModel);
     }
 
+    @GetMapping("/get/all")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Object> getAllPosts() {
+        return postService.getAllPosts();
+    }
+
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('TRAINER') or hasRole('TRAINEE')")
     public ResponseEntity<Object> getPost(@PathVariable("id") Long postId) {

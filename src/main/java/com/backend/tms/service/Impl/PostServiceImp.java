@@ -1,23 +1,15 @@
 package com.backend.tms.service.Impl;
 
-import com.backend.tms.entity.BatchEntity;
-import com.backend.tms.entity.ClassroomEntity;
-import com.backend.tms.entity.PostEntity;
-import com.backend.tms.entity.TrainerEntity;
-import com.backend.tms.exception.custom.ClassroomNotFoundException;
+import com.backend.tms.entity.*;
+import com.backend.tms.exception.custom.*;
+import com.backend.tms.model.Classroom.NoticeResModel;
 import com.backend.tms.model.Classroom.PostMessageReqModel;
-import com.backend.tms.repository.ClassroomRepository;
+import com.backend.tms.repository.*;
 import com.backend.tms.utlis.AppConstants;
 import com.backend.tms.utlis.FileService;
 import org.apache.commons.io.FileUtils;
-import com.backend.tms.exception.custom.BatchNotFoundException;
-import com.backend.tms.exception.custom.PostNotFoundException;
-import com.backend.tms.exception.custom.TrainerNotFoundException;
 import com.backend.tms.model.Classroom.PostReqModel;
 import com.backend.tms.model.Classroom.PostResModel;
-import com.backend.tms.repository.BatchRepository;
-import com.backend.tms.repository.PostRepository;
-import com.backend.tms.repository.TrainerRepository;
 import com.backend.tms.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -31,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -40,6 +33,7 @@ public class PostServiceImp implements PostService {
     private final TrainerRepository trainerRepository;
     private final ModelMapper modelMapper;
     private final ClassroomRepository classroomRepository;
+    private final UserRepository userRepository;
 
 
 
@@ -92,6 +86,35 @@ public class PostServiceImp implements PostService {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to retrieve post");
         }
     }
+
+    @Override
+    public ResponseEntity<Object> getAllPosts() {
+        List<PostEntity> postEntities = postRepository.findAll();
+        if (postEntities.isEmpty()) {
+            throw new PostNotFoundException("No posts published yet!");
+        }
+
+        // Convert List<PostEntity> to List<PostResModel> using ModelMapper
+        List<PostResModel> postResModels = postEntities.stream()
+                .map(this::convertToModel)
+                .collect(Collectors.toList());
+
+        return new ResponseEntity<>(postResModels, HttpStatus.OK);
+    }
+
+    private PostResModel convertToModel(PostEntity postEntity) {
+        PostResModel postResModel = modelMapper.map(postEntity, PostResModel.class);
+
+        if (postEntity.getTrainerId() != null) {
+            TrainerEntity trainer = trainerRepository.findById(postEntity.getTrainerId())
+                    .orElseThrow(() -> new TrainerNotFoundException("Trainer not found with ID: " + postEntity.getTrainerId()));
+            postResModel.setSenderName(trainer.getFullName());
+        }
+
+        return postResModel;
+    }
+
+
 
     @Override
     public ResponseEntity<Object> updatePost(Long postId, PostReqModel postModel) {
