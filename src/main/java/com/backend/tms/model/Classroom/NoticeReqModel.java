@@ -16,6 +16,6 @@ public class NoticeReqModel {
     private Long id;
     private String title;
     private Long classroomId;
-    private Long trainerId;
+    private String senderEmail;
     private MultipartFile file;
 }

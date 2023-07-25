@@ -3,13 +3,11 @@ package com.backend.tms.service.Impl;
 import com.backend.tms.entity.ClassroomEntity;
 import com.backend.tms.entity.NoticeEntity;
 import com.backend.tms.entity.TrainerEntity;
+import com.backend.tms.entity.UserEntity;
 import com.backend.tms.exception.custom.*;
 import com.backend.tms.model.Classroom.NoticeReqModel;
 import com.backend.tms.model.Classroom.NoticeResModel;
-import com.backend.tms.repository.BatchRepository;
-import com.backend.tms.repository.ClassroomRepository;
-import com.backend.tms.repository.NoticeRepository;
-import com.backend.tms.repository.TrainerRepository;
+import com.backend.tms.repository.*;
 import com.backend.tms.service.NoticeService;
 import com.backend.tms.utlis.AppConstants;
 import com.backend.tms.utlis.FileService;
@@ -35,6 +33,7 @@ public class NoticeServiceImp implements NoticeService {
     private final ModelMapper modelMapper;
     private final TrainerRepository trainerRepository;
     private final ClassroomRepository classroomRepository;
+    private final UserRepository userRepository;
 
 
     @Override
@@ -43,10 +42,6 @@ public class NoticeServiceImp implements NoticeService {
             // Validate if the associated classroom exists
             ClassroomEntity classroomEntity = classroomRepository.findById(noticeReqModel.getClassroomId())
                     .orElseThrow(() -> new ClassroomNotFoundException("Classroom not found"));
-
-            // Validate if the associated trainer exists
-            TrainerEntity trainerEntity = trainerRepository.findById(noticeReqModel.getTrainerId())
-                    .orElseThrow(() -> new TrainerNotFoundException("Trainer not found"));
 
             MultipartFile file = noticeReqModel.getFile();
             String fileUrl = null;
@@ -86,7 +81,7 @@ public class NoticeServiceImp implements NoticeService {
     @Override
     public ResponseEntity<Object> getAllNotice() {
         List<NoticeEntity> noticeEntities = noticeRepository.findAll();
-        if (noticeEntities == null || noticeEntities.isEmpty()) {
+        if (noticeEntities.isEmpty()) {
             throw new NoticeNotFoundException("There are no notices published yet!");
         }
 
@@ -112,7 +107,7 @@ public class NoticeServiceImp implements NoticeService {
             //updating the post Entity
             noticeEntity.setTitle(noticeModel.getTitle());
             noticeEntity.setClassroomId(noticeModel.getClassroomId());
-            noticeEntity.setTrainerId(noticeModel.getTrainerId());
+            noticeEntity.setSenderEmail(noticeModel.getSenderEmail());
 
             MultipartFile file = noticeModel.getFile();
             if (file != null && !file.isEmpty()) {
@@ -164,19 +159,19 @@ public class NoticeServiceImp implements NoticeService {
         for (NoticeEntity noticeEntity : noticeEntityList) {
             Map<String, Object> notice = new HashMap<>();
             notice.put("id", noticeEntity.getId());
-            notice.put("trainerId", noticeEntity.getTrainerId());
+            notice.put("senderEmail", noticeEntity.getSenderEmail());
             notice.put("classroomId", noticeEntity.getClassroomId());
             notice.put("title", noticeEntity.getTitle());
             notice.put("createdTime", noticeEntity.getCreatedTime());
             notice.put("fileUrl", noticeEntity.getFileUrl());
 
-            // Fetch the trainer's name using trainerRepository.findById(trainerId)
-            Optional<TrainerEntity> trainerOptional = trainerRepository.findById(noticeEntity.getTrainerId());
-            if (trainerOptional.isPresent()) {
-                TrainerEntity trainerEntity = trainerOptional.get();
-                notice.put("trainerName", trainerEntity.getFullName());
+            // Fetch the sender name using userRepository.findById(email)
+            UserEntity userEntity = userRepository.findByEmail(noticeEntity.getSenderEmail());
+
+            if (userEntity!=null) {
+                notice.put("senderName", userEntity.getName());
             } else {
-                notice.put("trainerName", "Trainer not found"); // Or any other default value
+                notice.put("senderName", "sender not found"); // Or any other default value
             }
             notices.add(notice);
         }

@@ -17,7 +17,7 @@ public class NoticeResModel {
     private Long id;
     private String title;
     private Long classroomId;
-    private Long trainerId;
+    private String senderEmail;
     private Date createdTime;
     private String file;
 }

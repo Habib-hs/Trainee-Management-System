@@ -20,7 +20,7 @@ public class NoticeEntity {
     private Long id;
     private String title;
     private Long classroomId;
-    private Long trainerId;
+    private String senderEmail;
     private String fileUrl;
     private Date createdTime;
 }
