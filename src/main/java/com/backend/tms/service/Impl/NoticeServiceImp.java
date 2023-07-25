@@ -93,7 +93,24 @@ public class NoticeServiceImp implements NoticeService {
     }
 
     private NoticeResModel convertToModel(NoticeEntity noticeEntity) {
-        return modelMapper.map(noticeEntity, NoticeResModel.class);
+        NoticeResModel noticeResModel = modelMapper.map(noticeEntity, NoticeResModel.class);
+
+        UserEntity userEntity = userRepository.findByEmail(noticeEntity.getSenderEmail());
+        if (userEntity != null) {
+            String role = userEntity.getRole();
+
+            if ("ADMIN".equals(role)) {
+                AdminEntity admin = adminRepository.findByEmail(noticeEntity.getSenderEmail());
+                noticeResModel.setSenderName(admin.getFullName());
+            } else {
+                TrainerEntity trainer = trainerRepository.findByEmail(noticeEntity.getSenderEmail());
+                noticeResModel.setSenderName(trainer.getFullName());
+            }
+        } else {
+            noticeResModel.setSenderName("sender not found"); // Or any other default value
+        }
+
+        return noticeResModel;
     }
 
     @Override
@@ -183,5 +200,6 @@ public class NoticeServiceImp implements NoticeService {
         response.put("Posts", notices);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
 
 }

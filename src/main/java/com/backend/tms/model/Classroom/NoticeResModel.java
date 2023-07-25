@@ -20,4 +20,5 @@ public class NoticeResModel {
     private String senderEmail;
     private Date createdTime;
     private String file;
+    private String senderName;
 }

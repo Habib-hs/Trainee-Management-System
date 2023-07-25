@@ -6,6 +6,8 @@ import com.backend.tms.model.ScheduleBatch.ScheduleBatchReqModel;
 import com.backend.tms.repository.BatchRepository;
 import com.backend.tms.repository.ScheduleRepository;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -18,12 +20,15 @@ public class ValidationUtlis {
         // Calculate the difference in days between start date and end date
         long durationInDays = TimeUnit.MILLISECONDS.toDays(endDate.getTime() - startDate.getTime());
 
-        // Check if the duration is between 90 days (3 months) and 122 days (4 months)
-        return durationInDays >=118 && durationInDays <= 122;
+        // Check if the duration is between 122 days (4 months)
+        return durationInDays <= 122;
     }
 
     public static boolean isDateRangeValid(Date startDate, Date endDate) {
-        return endDate.before(startDate) || startDate.equals(endDate);
+        LocalDate startLocalDate = startDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate endLocalDate = endDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+        return !endLocalDate.isBefore(startLocalDate);
     }
 
     public static boolean hasCommonCourseConflicts(ScheduleBatchReqModel scheduleBatchModel, ScheduleRepository scheduleRepository) {

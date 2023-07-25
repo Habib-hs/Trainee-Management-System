@@ -39,11 +39,11 @@ public class ScheduleBatchServiceImp implements ScheduleBatchService {
             throw new CourseAlreadyExistsException("The course is already Scheduled!");
         }
 
-         if(ValidationUtlis.isBatchDurationValid(scheduleBatchModel.getStartDate(), scheduleBatchModel.getEndDate())){
+         if(!ValidationUtlis.isBatchDurationValid(scheduleBatchModel.getStartDate(), scheduleBatchModel.getEndDate())){
              return new ResponseEntity<>("The Time range should not longer than 4 month", HttpStatus.BAD_REQUEST);
          }
 
-         if(ValidationUtlis.isDateRangeValid(scheduleBatchModel.getStartDate(), scheduleBatchModel.getEndDate())){
+         if(!ValidationUtlis.isDateRangeValid(scheduleBatchModel.getStartDate(), scheduleBatchModel.getEndDate())){
              return new ResponseEntity<>("Ending Date can't same or less than Starting Date", HttpStatus.BAD_REQUEST);
          }
 
