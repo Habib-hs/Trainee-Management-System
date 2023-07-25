@@ -44,13 +44,15 @@ public class BatchServiceImp implements BatchService {
         }
 
         //duration of a batch validation
-        if (ValidationUtlis.isBatchDurationValid(batchModel.getStartDate(),batchModel.getEndDate())) {
+        if(!ValidationUtlis.isDateRangeValid(batchModel.getStartDate(), batchModel.getEndDate())){
+            return new ResponseEntity<>("Ending Date can't same or less than Starting Date", HttpStatus.BAD_REQUEST);
+        }
+
+        if (!ValidationUtlis.isBatchDurationValid(batchModel.getStartDate(),batchModel.getEndDate())) {
             throw new IllegalArgumentException("Batch duration should be 4 months.");
         }
 
-        if(ValidationUtlis.isDateRangeValid(batchModel.getStartDate(), batchModel.getEndDate())){
-            return new ResponseEntity<>("Ending Date can't same or less than Starting Date", HttpStatus.BAD_REQUEST);
-        }
+
 
 
         BatchEntity batchEntity = modelMapper.map(batchModel,BatchEntity.class);

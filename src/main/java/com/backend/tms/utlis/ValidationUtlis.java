@@ -18,7 +18,7 @@ public class ValidationUtlis {
         // Calculate the difference in days between start date and end date
         long durationInDays = TimeUnit.MILLISECONDS.toDays(endDate.getTime() - startDate.getTime());
 
-        // Check if the duration is between 90 days (3 months) and 124 days (4 months)
+        // Check if the duration is between 90 days (3 months) and 122 days (4 months)
         return durationInDays >=118 && durationInDays <= 122;
     }
 
