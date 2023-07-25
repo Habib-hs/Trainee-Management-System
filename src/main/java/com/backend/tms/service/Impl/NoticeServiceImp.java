@@ -25,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -80,6 +81,26 @@ public class NoticeServiceImp implements NoticeService {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to retrieve post");
         }
+    }
+
+    @Override
+    public ResponseEntity<Object> getAllNotice() {
+        List<NoticeEntity> noticeEntities = noticeRepository.findAll();
+        if (noticeEntities == null || noticeEntities.isEmpty()) {
+            throw new NoticeNotFoundException("There are no notices published yet!");
+        }
+
+        // Convert List<NoticeEntity> to List<NoticeResModel> using ModelMapper
+        List<NoticeResModel> noticeResModels = noticeEntities.stream()
+                .map(this::convertToModel)
+                .collect(Collectors.toList());
+
+        return new ResponseEntity<>(noticeResModels, HttpStatus.OK);
+
+    }
+
+    private NoticeResModel convertToModel(NoticeEntity noticeEntity) {
+        return modelMapper.map(noticeEntity, NoticeResModel.class);
     }
 
     @Override

@@ -26,6 +26,12 @@ public class NoticeController {
         return noticeService.getNotice(noticeId);
     }
 
+    @GetMapping("/get/all")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Object> getAllNotice() {
+        return noticeService.getAllNotice();
+    }
+
     @PutMapping("/update/{id}")
     @PreAuthorize("hasRole('TRAINER') or hasRole('ADMIN")
     public ResponseEntity<Object> updateNotice(@PathVariable("id") Long noticeId, @ModelAttribute NoticeReqModel noticeModel) {

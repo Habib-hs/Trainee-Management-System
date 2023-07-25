@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface NoticeService {
      ResponseEntity<Object> createNotice(NoticeReqModel noticeReqModel);
       ResponseEntity<Object> getNotice(Long noticeId);
+     ResponseEntity<Object> getAllNotice();
       ResponseEntity<Object> updateNotice(Long noticeId, NoticeReqModel noticeModel);
       ResponseEntity<Object> downloadNoticeFile(Long noticeId);
      ResponseEntity<Object> getAllNoticeByClassroomId(Long classroomId);
