@@ -165,10 +165,10 @@ public class NoticeServiceImp implements NoticeService {
 
             // Fetch the sender name using userRepository.findById(email)
             UserEntity userEntity = userRepository.findByEmail(noticeEntity.getSenderEmail());
-
             if (userEntity!=null) {
                 String role = userEntity.getRole();
-                if (role == "ADMIN"){
+
+                if ("ADMIN".equals(role)){
                     AdminEntity admin = adminRepository.findByEmail(noticeEntity.getSenderEmail());
                     notice.put("senderName", admin.getFullName());
                 }else{
@@ -180,7 +180,6 @@ public class NoticeServiceImp implements NoticeService {
             }
             notices.add(notice);
         }
-
         response.put("Posts", notices);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

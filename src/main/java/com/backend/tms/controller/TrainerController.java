@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 public class TrainerController {
     private final TrainerService trainerService;
 
-    @GetMapping("/all")
+    @GetMapping("/get/all")
     @PreAuthorize("hasRole('ADMIN') ")
     public ResponseEntity<Object> getAllTrainers() {
         return trainerService.getAllTrainers();
