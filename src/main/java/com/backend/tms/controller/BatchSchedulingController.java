@@ -23,4 +23,20 @@ public class BatchSchedulingController {
     public ResponseEntity<Object> getScheduleNames(){
         return scheduleBatchService.getScheduleNames();
     }
+
+    @PutMapping("update/{scheduleId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Object> updateScheduleBatch(
+            @PathVariable Long scheduleId,
+            @RequestBody ScheduleBatchReqModel scheduleBatchModel) {
+        return scheduleBatchService.updateScheduleBatch(scheduleId, scheduleBatchModel);
+    }
+
+    @DeleteMapping("/delete/{scheduleId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Object> deleteScheduleBatch(@PathVariable Long scheduleId) {
+        return scheduleBatchService.deleteScheduleBatch(scheduleId);
+    }
+
+
 }

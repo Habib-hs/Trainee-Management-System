@@ -6,6 +6,7 @@ import com.backend.tms.entity.ScheduleBatchEntity;
 import com.backend.tms.entity.TrainerEntity;
 import com.backend.tms.exception.custom.BatchNotFoundException;
 import com.backend.tms.exception.custom.CourseAlreadyExistsException;
+import com.backend.tms.exception.custom.CourseNotFoundException;
 import com.backend.tms.model.ScheduleBatch.ScheduleBatchReqModel;
 import com.backend.tms.repository.BatchRepository;
 import com.backend.tms.repository.CourseRepository;
@@ -19,6 +20,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
@@ -73,8 +76,16 @@ public class ScheduleBatchServiceImp implements ScheduleBatchService {
             Map<String, Object> scheduleData = new HashMap<>();
             scheduleData.put("id", schedule.getId());
             scheduleData.put("name", schedule.getCourseName());
-            scheduleData.put("startingDate", schedule.getStartDate());
-            scheduleData.put("endingDate", schedule.getEndDate());
+
+            // Format startingDate and endingDate to a more readable string format
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.ENGLISH);
+            Date startingDate = schedule.getStartDate();
+            LocalDateTime startingDateTime = startingDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+            scheduleData.put("startingDate", startingDateTime.format(dateFormatter));
+            Date endingDate = schedule.getEndDate();
+            LocalDateTime endingDateTime = endingDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+            scheduleData.put("endingDate", endingDateTime.format(dateFormatter));
+
             scheduleData.put("courseType", schedule.getCourseType());
 
             //getting the trainer name
@@ -100,12 +111,79 @@ public class ScheduleBatchServiceImp implements ScheduleBatchService {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @Override
+    public ResponseEntity<Object> updateScheduleBatch(Long scheduleId, ScheduleBatchReqModel scheduleBatchModel) {
+        ScheduleBatchEntity existingSchedule = scheduleRepository.findById(scheduleId)
+                .orElseThrow(() -> new BatchNotFoundException("Schedule not found with ID: " + scheduleId));
+
+        // Check if the courseId is valid
+        ScheduleBatchEntity existingScheduleByCourseName = scheduleRepository.findByCourseName(scheduleBatchModel.getCourseName());
+        if (existingScheduleByCourseName != null && !existingScheduleByCourseName.getId().equals(scheduleId)) {
+            throw new CourseAlreadyExistsException("The course is already Scheduled!");
+        }
+
+        if (!ValidationUtlis.isBatchDurationValid(scheduleBatchModel.getStartDate(), scheduleBatchModel.getEndDate())) {
+            return new ResponseEntity<>("The Time range should not longer than 4 months", HttpStatus.BAD_REQUEST);
+        }
+
+        if (!ValidationUtlis.isDateRangeValid(scheduleBatchModel.getStartDate(), scheduleBatchModel.getEndDate())) {
+            return new ResponseEntity<>("Ending Date can't be the same or less than Starting Date", HttpStatus.BAD_REQUEST);
+        }
+
+        // Separate validation for Common & Domain Specific Course
+        if (scheduleBatchModel.getCourseType().equals("Common")) {
+            if (ValidationUtlis.hasCommonCourseConflicts(scheduleBatchModel, scheduleRepository)) {
+                return new ResponseEntity<>("The course overlaps with an existing common course", HttpStatus.BAD_REQUEST);
+            }
+        } else {
+            if (ValidationUtlis.hasDomainCourseConflicts(scheduleBatchModel, batchRepository)) {
+                return new ResponseEntity<>("The course overlaps with an existing course for the same batch", HttpStatus.BAD_REQUEST);
+            }
+        }
+
+        // Update the scheduleBatchEntity with the new data
+        existingSchedule.setCourseName(scheduleBatchModel.getCourseName());
+        existingSchedule.setCourseType(scheduleBatchModel.getCourseType());
+        existingSchedule.setStartDate(scheduleBatchModel.getStartDate());
+        existingSchedule.setEndDate(scheduleBatchModel.getEndDate());
+
+        String courseType = scheduleBatchModel.getCourseType();
+        if ("Common".equals(courseType)) {
+            mapCommonOrDomainCourse(existingSchedule, true, null);
+        } else {
+            mapCommonOrDomainCourse(existingSchedule, false, scheduleBatchModel);
+        }
+
+        scheduleRepository.save(existingSchedule);
+        return new ResponseEntity<>("Schedule updated successfully", HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<Object> deleteScheduleBatch(Long scheduleId) {
+        ScheduleBatchEntity existingSchedule = scheduleRepository.findById(scheduleId)
+                .orElseThrow(() -> new BatchNotFoundException("Schedule not found with ID: " + scheduleId));
+
+        // Remove the relationship between ScheduleBatchEntity and BatchEntity
+        existingSchedule.getBatches().clear();
+        scheduleRepository.save(existingSchedule);
+        scheduleRepository.delete(existingSchedule);
+
+        return new ResponseEntity<>("Schedule deleted successfully", HttpStatus.OK);
+    }
+
+
     private ScheduleBatchEntity mapToScheduleBatchEntity(ScheduleBatchReqModel scheduleBatchModel) {
         ScheduleBatchEntity scheduleBatchEntity = new ScheduleBatchEntity();
         scheduleBatchEntity.setCourseName(scheduleBatchModel.getCourseName());
         scheduleBatchEntity.setCourseType(scheduleBatchModel.getCourseType());
         scheduleBatchEntity.setStartDate(scheduleBatchModel.getStartDate());
         scheduleBatchEntity.setEndDate(scheduleBatchModel.getEndDate());
+
+        //saved the course to the schedule
+        CourseEntity course=courseRepository.findById(scheduleBatchModel.getCourseId())
+                .orElseThrow(()->new CourseNotFoundException("Course not Found!"));
+
+        scheduleBatchEntity.setCourse(course);
 
         String courseType = scheduleBatchModel.getCourseType();
         if ("Common".equals(courseType)) {

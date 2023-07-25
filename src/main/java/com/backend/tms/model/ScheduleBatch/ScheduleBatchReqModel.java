@@ -20,7 +20,7 @@ public class ScheduleBatchReqModel {
     private String courseType;
     private Date startDate;
     private Date endDate;
-    private String courseId;
+    private Long courseId;
     private List<Long> batchesIds;
 
     // Constructors, getters, and setters can be added here
