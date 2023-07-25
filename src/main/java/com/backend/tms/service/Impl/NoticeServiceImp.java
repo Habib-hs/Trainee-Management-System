@@ -1,9 +1,6 @@
 package com.backend.tms.service.Impl;
 
-import com.backend.tms.entity.ClassroomEntity;
-import com.backend.tms.entity.NoticeEntity;
-import com.backend.tms.entity.TrainerEntity;
-import com.backend.tms.entity.UserEntity;
+import com.backend.tms.entity.*;
 import com.backend.tms.exception.custom.*;
 import com.backend.tms.model.Classroom.NoticeReqModel;
 import com.backend.tms.model.Classroom.NoticeResModel;
@@ -34,6 +31,7 @@ public class NoticeServiceImp implements NoticeService {
     private final TrainerRepository trainerRepository;
     private final ClassroomRepository classroomRepository;
     private final UserRepository userRepository;
+    private final AdminRepository adminRepository;
 
 
     @Override
@@ -169,7 +167,14 @@ public class NoticeServiceImp implements NoticeService {
             UserEntity userEntity = userRepository.findByEmail(noticeEntity.getSenderEmail());
 
             if (userEntity!=null) {
-                notice.put("senderName", userEntity.getName());
+                String role = userEntity.getRole();
+                if (role == "ADMIN"){
+                    AdminEntity admin = adminRepository.findByEmail(noticeEntity.getSenderEmail());
+                    notice.put("senderName", admin.getFullName());
+                }else{
+                    TrainerEntity trainer = trainerRepository.findByEmail(noticeEntity.getSenderEmail());
+                    notice.put("senderName", trainer.getFullName());
+                }
             } else {
                 notice.put("senderName", "sender not found"); // Or any other default value
             }
