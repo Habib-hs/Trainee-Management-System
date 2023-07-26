@@ -46,7 +46,7 @@ public class TraineeController {
         return traineeService.updateTrainee(traineeId, traineeModel);
     }
 
-    @DeleteMapping("delete/{id}")
+    @DeleteMapping("/delete/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Object> deleteTrainee(@PathVariable("id") Long traineeId) {
         return traineeService.deleteTrainee(traineeId);

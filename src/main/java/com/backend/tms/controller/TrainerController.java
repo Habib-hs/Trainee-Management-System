@@ -47,7 +47,7 @@ public class TrainerController {
         return trainerService.updateTrainer(trainerId, trainerModel);
     }
 
-    @DeleteMapping("delete/{id}")
+    @DeleteMapping("/delete/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Object> deleteTrainer(@PathVariable("id") Long trainerId) {
         return trainerService.deleteTrainer(trainerId);
