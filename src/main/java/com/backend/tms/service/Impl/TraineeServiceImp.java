@@ -127,14 +127,18 @@ public class TraineeServiceImp implements TraineeService {
 
     @Override
     public ResponseEntity<Object> deleteTrainee(Long traineeId) {
-        // Check if the batch exists
-       TraineeEntity trainee= traineeRepository.findById(traineeId).orElseThrow(()->new TraineeNotFoundException("Trainee not found"));
+        // Check if the trainee exists
+        TraineeEntity trainee = traineeRepository.findById(traineeId)
+                .orElseThrow(() -> new TraineeNotFoundException("Trainee not found"));
+
+        // Find the batch that contains the trainee and remove the trainee from the batch
+        batchRepository.findAll().stream()
+                .filter(batch -> batch.getTrainees().remove(trainee))
+                .findFirst();
+
         // Retrieve the associated UserEntity
         UserEntity user = trainee.getUser();
-        if (user != null) {
-            userRepository.delete(user);
-        }
-        // Delete the trainee
+        if (user != null) {userRepository.delete(user);}
         traineeRepository.deleteById(traineeId);
         return new ResponseEntity<>("Trainee deleted successfully", HttpStatus.OK);
     }
