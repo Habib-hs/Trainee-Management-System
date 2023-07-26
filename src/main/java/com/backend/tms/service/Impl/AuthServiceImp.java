@@ -1,5 +1,5 @@
 package com.backend.tms.service.Impl;
-
+import org.springframework.security.authentication.BadCredentialsException;
 import com.backend.tms.entity.AdminEntity;
 import com.backend.tms.entity.TraineeEntity;
 import com.backend.tms.entity.TrainerEntity;
@@ -48,7 +48,6 @@ public class AuthServiceImp implements AuthService {
         }
         // Create a new UserEntity
         UserEntity userEntity = UserEntity.builder()
-                .id(adminModel.getId()) // Set the ID explicitly
                 .email(adminModel.getEmail())
                 .password(passwordEncoder.encode(adminModel.getPassword()))
                 .role("ADMIN")
@@ -70,7 +69,6 @@ public class AuthServiceImp implements AuthService {
         }
         // Create a new UserEntity
         UserEntity userTrainee = UserEntity.builder()
-                .id(traineeModel.getId())
                 .email(traineeModel.getEmail())
                 .password(passwordEncoder.encode(traineeModel.getPassword()))
                 .role("TRAINEE")
@@ -94,7 +92,6 @@ public class AuthServiceImp implements AuthService {
         }
         // Create a new UserEntity
         UserEntity userEntity = UserEntity.builder()
-                .id(trainerModel.getId()) // Set the ID explicitly
                 .email(trainerModel.getEmail())
                 .password(passwordEncoder.encode(trainerModel.getPassword()))
                 .role("TRAINER")
@@ -114,19 +111,25 @@ public class AuthServiceImp implements AuthService {
 
     @Override
     public ResponseEntity<Object> login(AuthenticationReqModel requestModel) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        requestModel.getEmail(),
-                        requestModel.getPassword()
-                )
-        );
-        var user = userRepository.findByEmail(requestModel.getEmail());
-        var jwtToken = jwtService.generateToken(user);
-        AuthenticationResModel authenticationResponse = AuthenticationResModel.builder()
-                .message("Successfully Login!")
-                .roleBasedId(user.getRoleBasedId())
-                .token(jwtToken)
-                .build();
-        return ResponseEntity.ok(authenticationResponse);
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            requestModel.getEmail(),
+                            requestModel.getPassword()
+                    )
+            );
+            var user = userRepository.findByEmail(requestModel.getEmail());
+            var jwtToken = jwtService.generateToken(user);
+            AuthenticationResModel authenticationResponse = AuthenticationResModel.builder()
+                    .message("Successfully Login!")
+                    .roleBasedId(user.getRoleBasedId())
+                    .token(jwtToken)
+                    .build();
+            return ResponseEntity.ok(authenticationResponse);
+        } catch (BadCredentialsException ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password");
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred during login");
+        }
     }
 }
