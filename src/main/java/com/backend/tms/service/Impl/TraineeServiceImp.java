@@ -134,7 +134,8 @@ public class TraineeServiceImp implements TraineeService {
         // Find the batch that contains the trainee and remove the trainee from the batch
         batchRepository.findAll().stream()
                 .filter(batch -> batch.getTrainees().remove(trainee))
-                .findFirst();
+                .findFirst()
+                .ifPresent(batchRepository::save);
 
         // Retrieve the associated UserEntity
         UserEntity user = trainee.getUser();
