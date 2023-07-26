@@ -101,7 +101,7 @@ public class TrainerServiceImp implements TrainerService {
         if (trainer == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Trainer not found");
         }
-        Set<BatchEntity> batches = trainer.getBatches(); // Assuming there's a getter for the batches in TrainerEntity
+        Set<BatchEntity> batches = trainer.getBatches();
         List<Long> batchIds = batches.stream().map(BatchEntity::getId).collect(Collectors.toList());
         return ResponseEntity.ok(batchIds);
     }
@@ -119,9 +119,17 @@ public class TrainerServiceImp implements TrainerService {
     @Override
     public ResponseEntity<Object> deleteTrainer(Long trainerId) {
         // Check if the Trainer exists
-      TrainerEntity trainer=  trainerRepository.findById(trainerId).orElseThrow(()->new TrainerNotFoundException("Trainer not found"));
+        TrainerEntity trainer = trainerRepository.findById(trainerId)
+                .orElseThrow(() -> new TrainerNotFoundException("Trainer not found"));
+
+        // Remove the trainer from all batches
+        for (BatchEntity batch : trainer.getBatches()) {
+            batch.getTrainers().remove(trainer);
+            batchRepository.save(batch);
+        }
+        // Delete the trainer entity
         UserEntity user = trainer.getUser();
-        if(user!=null){
+        if (user != null) {
             userRepository.delete(user);
         }
         trainerRepository.deleteById(trainerId);
