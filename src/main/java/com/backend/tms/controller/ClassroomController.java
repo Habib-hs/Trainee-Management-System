@@ -15,13 +15,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class ClassroomController {
     private final ClassroomService classroomService;
     @GetMapping("/get/all")
-    @PreAuthorize("hasRole('TRAINEE') or hasRole('TRAINER')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Object> getAllClassroom() {
         return classroomService.getAllClassroomName();
     }
 
     @GetMapping("/{classroomName}")
-    @PreAuthorize("hasRole('TRAINER')")
+    @PreAuthorize("hasRole('TRAINER') or hasRole('TRAINEE') or hasRole('ADMIN')")
     public ResponseEntity<Object> getClassroomByName(@PathVariable("classroomName") String classroomName) {
         return classroomService.getClassroomByName(classroomName);
     }
